@@ -65,6 +65,8 @@ h1 {
     display: grid;
     justify-content: center;
     align-content: center;
+    color: steelblue;
+    font-size: 1.5em;
     background-color: white;
     width: calc(var(--board-size) / 9 - 1px);
     height: calc(var(--board-size) / 9 - 1px);
