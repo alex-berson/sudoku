@@ -116,10 +116,12 @@ const showBoard = () => document.querySelector("body").style.opacity = 1;
 
 const touchScreen = () => matchMedia('(hover: none)').matches;
 
-const squareCoords = (touchedSquare) => {
+const cellCoords = (touchedCell) => {
 
-    for (let [i, square] of squares.entries()) {
-        if (square == touchedSquare) return [Math.floor(i / 8), i % 8];
+    let cells = document.querySelectorAll('.cell');
+
+    for (let [i, cell] of cells.entries()) {
+        if (cell == touchedCell) return [Math.floor(i / 9), i % 9];
     }
 }
 
@@ -360,6 +362,19 @@ const fill = () => {
     return true;
 }
 
+const save = () => {
+
+    let cells = document.querySelectorAll('.cell');
+
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+
+            cells[row * 9 + col].dataset.val = board[row][col];
+
+        }
+    }
+}
+
 const remove = () => {
 
     let cells = Array.from({length: 81}, (_, i) => i);
@@ -425,16 +440,154 @@ const fillBoard = () => {
 
 }
 
+const checkRow = (row, col, val) => {
+
+    console.log(' ');
+
+    for (let i = 0; i < 9; i++) {
+
+        if (i == col || board[row][i] != 0) continue;
+
+        console.log('row: ', row, i, valid(board, row, i, val));
+
+        if (valid(board, row, i, val)) return false;
+    }
+
+    console.log('ROW');
+
+    return true;
+}
+
+const checkCol = (row, col, val) => {
+
+    console.log(' ');
+
+    for (let i = 0; i < 9; i++) {
+
+        if (i == row || board[i][col] != 0) continue;
+
+        console.log('col: ', i, col, valid(board, i, col, val));
+
+        if (valid(board, i, col, val)) return false;
+    }
+    console.log('COL');
+
+
+    return true;
+}
+
+const checkSquare = (row, col, val) => {
+
+    let boxRow = Math.floor(row / 3) * 3;
+    let boxCol = Math.floor(col / 3) * 3;
+
+    console.log(' ');
+
+
+
+    for (let i = 0; i < 9; i++) {
+
+
+        let r = boxRow + Math.floor(i / 3);
+        let c = boxCol + Math.floor(i % 3);
+
+        if (r == row && c == col || board[r][c] != 0) continue;
+
+        console.log('sq: ', r, c, valid(board, r, c, val));
+
+        if (valid(board, r, c, val)) return false;
+    }
+
+    console.log('SQ');
+
+
+    return true;
+}
+
+const checkCell = (row, col, val) => {
+
+    console.log(' ');
+
+
+    for (i = 1; i <= 9; i++) {
+
+        if (i == val) continue;
+
+        if (valid(board, row, col, val)) return false;
+    }
+
+    console.log('CELL');
+
+    return true;
+}
+
+const logic = (row, col, val) => {
+
+    if (checkRow(row, col, val) || checkCol(row, col, val) || checkSquare(row, col, val) || checkCell(row, col, val)) return true;
+
+    // if (checkRow(row, col, val)) return true;
+
+
+    return false;
+}
+
+const select = (e) => {
+
+    let cell = e.currentTarget;
+
+    console.table(board);
+
+    let [row, col] = cellCoords(cell);
+
+    let val = parseInt(cell.dataset.val);
+
+    console.log(row, col, val);
+
+    // logic(row, col, val) ? cell.classList.add('green') : cell.classList.add('red');
+
+    cell.classList.add('green')
+
+    cell.innerText = val;
+    board[row][col] = val;
+}
+
+const enableTouch = () => {
+
+    let cells = document.querySelectorAll('.cell');
+
+    for (let cell of cells){
+        if (touchScreen()){
+            cell.addEventListener("touchstart", select);
+        } else {
+            cell.addEventListener("mousedown", select);
+        }
+    }
+}
+
+const disableTouch = () => {
+
+    let cells = document.querySelectorAll('.cell');
+
+    for (let cell of cells){
+        if (touchScreen()){
+            cell.removeEventListener("touchstart", select);
+        } else {
+            cell.removeEventListener("mousedown", select);
+        }
+    }
+}
+
 const init = () => {
 
     disableTapZoom();
     setBoardSize();
     initBoard();
-    showBoard();
     
     let t0 = performance.now();
 
     fill();
+
+    save(); 
 
     let t1 = performance.now();
 
@@ -443,6 +596,10 @@ const init = () => {
     let t2 = performance.now();
 
     fillBoard();
+
+    showBoard();
+
+    enableTouch();
 
     solvable(true);
 

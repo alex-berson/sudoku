@@ -140,6 +140,14 @@ h1 {
     cursor: pointer;
 }  
 
+.red {
+    color: firebrick;
+}
+
+.green {
+    color: SeaGreen;
+}
+
 #designed {
     text-align: center;
     align-self: auto;
