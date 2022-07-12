@@ -141,6 +141,8 @@ const setBoardSize = () => {
 const disableTapZoom = () => {
     const preventDefault = (e) => e.preventDefault();
     document.body.addEventListener('touchstart', preventDefault, {passive: false});
+    document.body.addEventListener('mousedown', preventDefault, {passive: false});
+
 }
 
 const shuffle = (array) => {
@@ -370,6 +372,7 @@ const save = () => {
         for (let col = 0; col < 9; col++) {
 
             cells[row * 9 + col].dataset.val = board[row][col];
+            // cells[row * 9 + col].innerText = board[row][col];
 
         }
     }
@@ -390,7 +393,7 @@ const remove = () => {
         let col = cell % 9;
         let val = board[row][col];
 
-        if (count(board) == 38) break;
+        if (count(board) == 28) break;
         
         board[row][col] = 0;
 
@@ -433,11 +436,14 @@ const fillBoard = () => {
 
         let val = flatBoard.shift();
 
-        if (val) cell.innerText = val;
+        if (val) {
+            cell.innerText = val;
+            cell.classList.add('filled');
+        } else {
+            // cell.classList.add('green');
+        }
 
     });
-
-
 }
 
 const checkRow = (row, col, val) => {
@@ -534,8 +540,9 @@ const logic = (row, col, val) => {
 const select = (e) => {
 
     let cell = e.currentTarget;
+    let cells = document.querySelectorAll('.cell');
 
-    console.table(board);
+    // console.table(board);
 
     let [row, col] = cellCoords(cell);
 
@@ -545,11 +552,153 @@ const select = (e) => {
 
     // logic(row, col, val) ? cell.classList.add('green') : cell.classList.add('red');
 
-    cell.classList.add('green')
+    if (cell.classList.contains('filled')) { 
+        for (let cell of cells) {
+            cell.classList.remove('gray');
+        }
 
-    cell.innerText = val;
-    board[row][col] = val;
+        document.querySelector('.numbers').classList.remove('display');
+        document.querySelector('.eraser').classList.remove('display');
+
+        // disableDigits();
+        // disableEraser();
+        return;
+    }
+
+    if (cell.classList.contains('gray')) {
+        cell.classList.remove('gray');
+        document.querySelector('.numbers').classList.remove('display');
+        document.querySelector('.eraser').classList.remove('display');
+        // disableDigits();
+        // disableEraser();
+
+        return;
+    } 
+
+    for (let cell of cells) {
+        cell.classList.remove('gray');
+    }
+
+    cell.classList.add('gray');
+
+    document.querySelector('.numbers').classList.remove('display');
+    document.querySelector('.eraser').classList.remove('display');
+
+    if (cell.classList.contains('red')) {
+
+        document.querySelector('.numbers').style.display = 'none';
+        document.querySelector('.eraser').style.display = 'flex';
+
+        setTimeout(() => {
+            document.querySelector('.eraser').classList.add('display');   
+            // enableEraser();              
+        }, 0);
+
+        return;  
+    }
+
+    document.querySelector('.eraser').style.display = 'none';
+    document.querySelector('.numbers').style.display = 'flex';
+
+    setTimeout(() => {
+        document.querySelector('.numbers').classList.add('display');   
+        // enableDigits();             
+    }, 0);
 }
+
+const selectDigit = (e) => {
+
+    let digit = parseInt(e.currentTarget.innerText);
+    let cells = document.querySelectorAll('.cell');
+
+    for (let cell of cells) {
+        if (cell.classList.contains('gray')) {
+
+            let [row, col] = cellCoords(cell);
+
+            cell.classList.remove('gray');
+
+            cell.dataset.val == digit ? cell.classList.add('filled') : cell.classList.add('red'); 
+            cell.innerText = digit;
+            board[row][col] = digit;
+
+        }
+
+        document.querySelector('.numbers').classList.remove('display');
+        // disableDigits();
+    }
+
+    console.log(digit);
+}
+
+const eraser = (e) => {
+
+    let cells = document.querySelectorAll('.cell');
+
+    for (let cell of cells) {
+        if (cell.classList.contains('gray')) {
+
+            let [row, col] = cellCoords(cell);
+
+            cell.classList.remove('gray','red');
+            cell.innerText = '';
+            board[row][col] = 0;
+        }
+
+        document.querySelector('.eraser').classList.remove('display');
+
+        // disableDigits();
+        // disableEraser();
+    }
+}
+
+const enableDigits = () => {
+
+    let digits = document.querySelectorAll('.number');
+
+    for (let digit of digits){
+        if (touchScreen()){
+            digit.addEventListener("touchstart", selectDigit);
+        } else {
+            digit.addEventListener("mousedown", selectDigit);
+        }
+    }
+}
+
+// const disableDigits = () => {
+
+//     let digits = document.querySelectorAll('.number');
+
+//     for (let digit of digits){
+//         if (touchScreen()){
+//             digit.removeEventListener("touchstart", selectDigit);
+//         } else {
+//             digit.removeEventListener("mousedown", selectDigit);
+//         }
+//     }
+// }
+
+const enableEraser = () => {
+
+    let x = document.querySelector('.x');
+
+        if (touchScreen()){
+            x.addEventListener("touchstart", eraser);
+        } else {
+            x.addEventListener("mousedown", eraser);
+        }
+}
+
+// const disableEraser = () => {
+
+//     let x = document.querySelector('.x');
+
+//         if (touchScreen()){
+//             x.removeEventListener("touchstart", eraser);
+//         } else {
+//             x.removeEventListener("mousedown", eraser);
+//         }
+// }
 
 const enableTouch = () => {
 
@@ -600,6 +749,8 @@ const init = () => {
     showBoard();
 
     enableTouch();
+    enableDigits();
+    enableEraser();
 
     solvable(true);
 
