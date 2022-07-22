@@ -225,6 +225,28 @@ body:hover {
     /* background-color: whitesmoke; */
 }
 
+.digit {
+    line-height: 90%;
+}
+
+@keyframes pop {
+    0% {
+      transform: scale(1); 
+    }
+  
+    50% {
+      transform: scale(1.5); 
+    } 
+
+    100% {
+        transform: scale(1); 
+      } 
+}
+
+.pop {
+    animation: pop 0.3s ease forwards;
+}
+
 #designed {
     text-align: center;
     align-self: auto;
@@ -300,29 +322,40 @@ body:hover {
 
     .board {
         border: 15px solid steelblue;
-        width: calc(var(--board-size-big) + 4px);
-        height: calc(var(--board-size-big) + 4px);
+        /* width: calc(var(--board-size-big) + 4px); */
+        /* height: calc(var(--board-size-big) + 4px); */
+        width: calc(var(--board-size-big) + 3px);
+        height: calc(var(--board-size-big) + 3px);
         /* padding: 2px; */
-        gap: 2px 2px;
-        /* margin-top: -30px; */
+        /* gap: 2px 2px; */
+        gap: 1px 1px;
+
     }
 
     .cell {
-        width: calc(var(--board-size-big) / 9 - 2px);
-        height: calc(var(--board-size-big) / 9 - 2px);
+        /* width: calc(var(--board-size-big) / 9 - 2px); */
+        /* height: calc(var(--board-size-big) / 9 - 2px); */
+        width: calc(var(--board-size-big) / 9 - 1px);
+        height: calc(var(--board-size-big) / 9 - 1px);
         box-sizing: border-box;
     }
 
     .cell:nth-child(3),:nth-child(6) {
-        margin-right: 3px;
+        /* margin-right: 3px; */
+        margin-right: 2px;
+
     }
 
     .cell:nth-child(n + 19):nth-child(-n + 27) {
-        margin-bottom: 3px;
+        /* margin-bottom: 3px; */
+        margin-bottom: 2px;
+
     }
     
     .cell:nth-child(n + 46):nth-child(-n + 54) {
-        margin-bottom: 3px;
+        /* margin-bottom: 3px; */
+        margin-bottom: 2px;
+
     }
 
 

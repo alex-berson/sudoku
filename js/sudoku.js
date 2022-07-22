@@ -1,43 +1,4 @@
-// let board;
-
-// let board = [
-//     [
-//       2, 0, 0, 9, 0,
-//       0, 0, 0, 0
-//     ],
-//     [
-//       0, 6, 0, 0, 5,
-//       0, 0, 0, 0
-//     ],
-//     [
-//       0, 7, 4, 0, 0,
-//       1, 0, 0, 5
-//     ],
-//     [
-//       0, 0, 0, 0, 0,
-//       4, 8, 0, 0
-//     ],
-//     [
-//       4, 0, 0, 6, 0,
-//       0, 2, 1, 0
-//     ],
-//     [
-//       0, 3, 0, 0, 0,
-//       0, 0, 0, 0
-//     ],
-//     [
-//       0, 5, 0, 0, 1,
-//       0, 9, 0, 0
-//     ],
-//     [
-//       3, 0, 6, 2, 0,
-//       0, 0, 0, 0
-//     ],
-//     [
-//       0, 2, 0, 0, 0,
-//       0, 3, 6, 0
-//     ]
-//   ];
+let board;
 
 // let board = [
 //         [0,0,3,0,2,0,6,0,0],
@@ -52,15 +13,15 @@
 
 
 // let board = [
-//             [3,0,0,2,0,0,0,0,0],
-//             [0,0,0,1,0,7,0,0,0],
-//             [7,0,6,0,3,0,5,0,0],
-//             [0,7,0,0,0,9,0,8,0],
-//             [9,0,0,0,2,0,0,0,4],
-//             [0,1,0,8,0,0,0,5,0],
-//             [0,0,9,0,4,0,3,0,1],
-//             [0,0,0,7,0,2,0,0,0],
-//             [0,0,0,0,0,8,0,0,6]];
+// [3,0,0,2,0,0,0,0,0],
+// [0,0,0,1,0,7,0,0,0],
+// [7,0,6,0,3,0,5,0,0],
+// [0,7,0,0,0,9,0,8,0],
+// [9,0,0,0,2,0,0,0,4],
+// [0,1,0,8,0,0,0,5,0],
+// [0,0,9,0,4,0,3,0,1],
+// [0,0,0,7,0,2,0,0,0],
+// [0,0,0,0,0,8,0,0,6]];
 
 // let board = [
 //     [0,0,8,7,0,3,0,2,0],
@@ -74,17 +35,17 @@
 //     [1,0,0,0,6,9,0,0,5]
 // ];
 
-let board = [
-    [3,0,7,0,0,1,0,0,0],
-    [2,0,0,9,0,0,0,1,5],
-    [0,0,0,0,0,2,0,9,3],
-    [5,4,8,2,0,0,0,7,0],
-    [0,0,0,0,0,6,0,0,0],
-    [7,0,2,0,9,0,0,0,0],
-    [0,0,0,6,5,0,0,0,0],
-    [0,0,6,3,0,0,8,4,2],
-    [8,0,0,1,0,0,5,0,0]
-];
+// let board = [
+//     [3,0,7,0,0,1,0,0,0],
+//     [2,0,0,9,0,0,0,1,5],
+//     [0,0,0,0,0,2,0,9,3],
+//     [5,4,8,2,0,0,0,7,0],
+//     [0,0,0,0,0,6,0,0,0],
+//     [7,0,2,0,9,0,0,0,0],
+//     [0,0,0,6,5,0,0,0,0],
+//     [0,0,6,3,0,0,8,4,2],
+//     [8,0,0,1,0,0,5,0,0]
+// ];
 
 
 // let board = [
@@ -437,9 +398,10 @@ const fillBoard = () => {
         let val = flatBoard.shift();
 
         if (val) {
-            cell.innerText = val;
+            cell.firstChild.innerText = val;
             cell.classList.add('filled');
         } else {
+            cell.firstChild.innerText = '';
             // cell.classList.add('green');
         }
 
@@ -606,6 +568,7 @@ const select = (e) => {
     }, 0);
 }
 
+
 const selectDigit = (e) => {
 
     let digit = parseInt(e.currentTarget.innerText);
@@ -619,16 +582,62 @@ const selectDigit = (e) => {
             cell.classList.remove('gray');
 
             cell.dataset.val == digit ? cell.classList.add('filled') : cell.classList.add('red'); 
-            cell.innerText = digit;
-            board[row][col] = digit;
+            cell.firstChild.innerText = digit;
+            if (cell.dataset.val == digit) board[row][col] = digit;
 
         }
 
         document.querySelector('.numbers').classList.remove('display');
         // disableDigits();
+
     }
 
+    if (solved(board)) setTimeout(firework, 500);
+
     console.log(digit);
+}
+
+const reset = () => {
+
+    document.querySelector('.board').removeEventListener('touchstart', reset);
+    document.querySelector('.board').removeEventListener('mousedown', reset);
+
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.classList.remove('filled');
+        cell.firstChild.classList.remove('pop');
+    });
+
+    initBoard();    
+    fill();
+    save(); 
+    remove();
+    fillBoard();
+}
+
+const firework = () => {
+
+    console.log('FIREWORK');
+
+    let n = 0;
+
+    let cells = document.querySelectorAll('.cell');
+    let order = Array.from({length: 81}, (_, i) => i);
+    order = shuffle(order);
+    // console.log(cells);
+
+    const pop = () => {
+        if (n > 80){
+            document.querySelector('.board').addEventListener('touchstart', reset);
+            document.querySelector('.board').addEventListener('mousedown', reset);
+            clearInterval(popInterval);
+        } else {
+            cells[order[n]].firstChild.classList.add('pop');
+            n++;
+        }
+    }
+
+    let  popInterval = setInterval(pop, 100);
+
 }
 
 const eraser = (e) => {
@@ -641,7 +650,7 @@ const eraser = (e) => {
             let [row, col] = cellCoords(cell);
 
             cell.classList.remove('gray','red');
-            cell.innerText = '';
+            cell.firstChild.innerText = '';
             board[row][col] = 0;
         }
 
@@ -713,18 +722,18 @@ const enableTouch = () => {
     }
 }
 
-const disableTouch = () => {
+// const disableTouch = () => {
 
-    let cells = document.querySelectorAll('.cell');
+//     let cells = document.querySelectorAll('.cell');
 
-    for (let cell of cells){
-        if (touchScreen()){
-            cell.removeEventListener("touchstart", select);
-        } else {
-            cell.removeEventListener("mousedown", select);
-        }
-    }
-}
+//     for (let cell of cells){
+//         if (touchScreen()){
+//             cell.removeEventListener("touchstart", select);
+//         } else {
+//             cell.removeEventListener("mousedown", select);
+//         }
+//     }
+// }
 
 const init = () => {
 
