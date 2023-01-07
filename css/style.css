@@ -67,7 +67,6 @@ body:hover {
     margin-bottom: 10px;
     opacity: 0;
     visibility: hidden;
-
 }
 
 .number {
@@ -91,6 +90,11 @@ body:hover {
     font-weight: bold;
 }
 
+img {
+    height: calc(var(--board-size) / 10);
+    transform: translateY(2px);
+}
+
 .number:after {
     content: '';
     position: absolute;
@@ -104,8 +108,8 @@ body:hover {
     /* outline: 1px solid pink; */
 }
 
-.eraser {
-    display: grid;
+.hint {
+    /* display: grid; */
     position: relative; 
 
     grid-column: 1;
@@ -171,6 +175,19 @@ body:hover {
     margin: auto;
 }
 
+/* .board:after {
+    content: '';
+    position: absolute;
+    top: -0px;
+    bottom: -0px;
+    left: 0;
+    right: 0;
+}
+
+.board:hover {
+    cursor: pointer;
+} */
+
 .cell {
     box-sizing: border-box;
     display: grid;
@@ -199,30 +216,95 @@ body:hover {
     cursor: pointer;
 } 
 
-.red {
+@keyframes error {
+    0% {
+        color: white; 
+    }
+  
+    37% {
+        color: firebrick; 
+    } 
+
+    75% {
+        color: white; 
+    } 
+}
+
+
+@keyframes hint {
+    0% {
+        color: white; 
+    }
+  
+    37% {
+        color: steelblue; 
+    } 
+
+    75% {
+        color: white; 
+    } 
+}
+
+@keyframes quest {
+    0% {
+        opacity: 0; 
+    }
+  
+    12.5% {
+        opacity: 1;
+    } 
+
+    87.5% {
+        opacity: 1; 
+    } 
+
+    100% {
+        opacity: 0; 
+    } 
+}
+
+.wrong {
+    animation: blinking 0.75s 3 ease forwards;
+}
+
+.wrong {
+    animation: error 0.75s 3 ease forwards;
+}
+
+
+.correct {
+    /* animation: hint 1s 5 ease forwards; */
+}
+
+.lamp {
+    animation: quest 4s ease-in-out forwards;
+}
+
+/* .red {
     color: firebrick;
     transition: color 0.2s ease;
-}
+} */
+
 
 .filled {
     color: steelblue;
     transition: color 0.2s ease;
 }
 
-.green {
+/* .green { 
     color: steelblue;
-    /* color: dodgerblue; */
-    /* color: deepskyblue; */
-    /* color: MediumSeaGreen; */
-    /* color: green; */
-    /* font-weight: 500; */
-}
+} */
 
-.gray {
+.select, .gray {
     background-color: #ecf2f7;
     /* background-color: #f5f8fb; */
 
     /* background-color: whitesmoke; */
+}
+
+.bold {
+    font-weight: bold;
+    /* transition: font-weight 5s ease-in-out; */
 }
 
 .digit {
@@ -298,7 +380,7 @@ body:hover {
         right: -13px;
     }
 
-    .eraser {
+    .hint {
         /* width: calc(var(--board-size-big) + 3px); */
         width: calc(var(--board-size-big) / 9);
         height: calc(var(--board-size-big) / 9);
@@ -318,6 +400,11 @@ body:hover {
         right: -0px;
     
         /* outline: 1px solid pink */
+    }
+
+    img {
+        height: calc(var(--board-size) / 17);
+        transform: translateY(2px);
     }
 
     .board {
@@ -340,23 +427,20 @@ body:hover {
         box-sizing: border-box;
     }
 
-    .cell:nth-child(3),:nth-child(6) {
-        /* margin-right: 3px; */
+    /* .cell:nth-child(3),:nth-child(6) {
         margin-right: 2px;
 
     }
 
     .cell:nth-child(n + 19):nth-child(-n + 27) {
-        /* margin-bottom: 3px; */
         margin-bottom: 2px;
 
     }
     
     .cell:nth-child(n + 46):nth-child(-n + 54) {
-        /* margin-bottom: 3px; */
         margin-bottom: 2px;
 
-    }
+    } */
 
 
     .disk {
