@@ -182,7 +182,7 @@ const permuteArrays = (arrays) => {
         rest.forEach(permutation => result.push([...new Set([el].concat(permutation))]));
       });
 
-      return result.sort();
+      return result.sort((a, b) => a - b);
   }
 
 const minArray = (arrays) => arrays.reduce((prev, next) => prev.length > next.length ? next : prev);

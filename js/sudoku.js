@@ -1,5 +1,7 @@
 let board;
 let nClues = 28;
+let interval;
+
 // let board = [
 //         [0,0,3,0,2,0,6,0,0],
 //         [9,0,0,3,0,5,0,0,1],
@@ -73,9 +75,38 @@ const initBoard = () => {
             [0,0,0,0,0,0,0,0,0]];
 }
 
-const showBoard = () => document.querySelector("body").style.opacity = 1;
+const showBoard = () => document.body.style.opacity = 1;
 
 const touchScreen = () => matchMedia('(hover: none)').matches;
+
+const saveBoard = () => {
+
+    if (localStorage.getItem('solved') == null) {
+        let solved = solve();
+        localStorage.setItem('solved', JSON.stringify(solved))
+    }
+    
+    localStorage.setItem('board', JSON.stringify(board))
+};
+
+// const loadBoard = () => board = JSON.parse(localStorage.getItem('board'));
+
+const checkStorage = () => {
+
+    if (localStorage.getItem('board') != null) {
+
+        let solved = JSON.parse(localStorage.getItem('solved'));
+
+        board = JSON.parse(localStorage.getItem('board'));
+
+        save(solved);
+    }
+
+};
+
+const clearStorage = () => {
+    localStorage.clear();
+}
 
 const cellCoords = (touchedCell) => {
 
@@ -101,7 +132,7 @@ const setBoardSize = () => {
 
 const shuffle = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        let j = Math.trunc(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]]; 
     }
 
@@ -142,7 +173,7 @@ const valid = (board, row, col, val) => {
         if (board[row][i] == val || board[i][col] == val) return false;
 
         let currentRow = boxRow + Math.floor(i / 3);
-        let currrentCol = boxCol + Math.floor(i % 3);
+        let currrentCol = boxCol + i % 3;
 
         if (board[currentRow][currrentCol] == val) return false;
     }
@@ -208,7 +239,7 @@ const boxes = (board) => {
             for (let cell = 0; cell < 9; cell++) {
 
                 let row = boxRow + Math.floor(cell / 3);
-                let col = boxCol + Math.floor(cell % 3);
+                let col = boxCol + cell % 3;
 
                 if (board[row][col] != 0 || !valid(board, row, col, val)) continue;
 
@@ -250,7 +281,7 @@ const boxes = (board) => {
 //     return [null, null, null, null];
 // }
 
-const solve = (board, final = false) => {
+const find = (board, final = false) => {
 
     let row, col, val, num;
 
@@ -314,7 +345,7 @@ const fill = () => {
     return true;
 }
 
-const save = () => {
+const save = (board) => {
 
     let cells = document.querySelectorAll('.cell');
 
@@ -359,7 +390,7 @@ const solvable = (steps = false, final = false) => {
 
     do {
 
-        let [row, col, val, num] = solve(tempBoard, final);
+        let [row, col, val, num] = find(tempBoard, final);
 
         if (steps) console.log(row, col, val, num);
 
@@ -374,7 +405,22 @@ const solvable = (steps = false, final = false) => {
     return true;
 }
 
-// document.querySelector('.time').innerHTML = t2 - t1;
+const solve = (final = false) => {
+
+    let tempBoard = board.map(arr => arr.slice());
+
+    do {
+
+        let [row, col, val, num] = find(tempBoard, final);
+
+        if (row == null) return false;
+
+        tempBoard[row][col] = val;
+
+    } while(!solved(tempBoard));
+
+    return tempBoard;
+}
 
 const fillBoard = () => {
 
@@ -385,6 +431,8 @@ const fillBoard = () => {
     document.querySelectorAll('.cell').forEach(cell => {
 
         let val = flatBoard.shift();
+
+        // cell.dataset.val = val;
 
         if (val) {
             cell.firstChild.innerText = val;
@@ -496,11 +544,13 @@ const select = (e) => {
     // console.table(board);
 
     clearHint();
-    enableHint();
+    // enableBar();
 
-    if (cell.classList.contains('correct') || cell.classList.contains('wrong')) {
-        cell.style.animationDuration = '0s'
-    }
+    console.log(e.currentTarget);
+
+    // if (cell.classList.contains('correct') || cell.classList.contains('wrong')) {
+        // cell.style.animationDuration = '0.1s'
+    // }
 
     let [row, col] = cellCoords(cell);
 
@@ -516,7 +566,7 @@ const select = (e) => {
         }
 
         document.querySelector('.numbers').classList.remove('display');
-        document.querySelector('.hint').classList.remove('display');
+        document.querySelector('.bar').classList.remove('display');
 
         // disableDigits();
         // disableEraser();
@@ -526,7 +576,7 @@ const select = (e) => {
     if (cell.classList.contains('select')) {
         cell.classList.remove('select');
         document.querySelector('.numbers').classList.remove('display');
-        document.querySelector('.hint').classList.remove('display');
+        document.querySelector('.bar').classList.remove('display');
         // disableDigits();
         // disableEraser();
 
@@ -540,7 +590,7 @@ const select = (e) => {
     cell.classList.add('select');
 
     document.querySelector('.numbers').classList.remove('display');
-    document.querySelector('.hint').classList.remove('display');
+    document.querySelector('.bar').classList.remove('display');
 
     // if (cell.classList.contains('red')) {
 
@@ -555,7 +605,7 @@ const select = (e) => {
     //     return;  
     // }
 
-    document.querySelector('.hint').style.display = 'none';
+    document.querySelector('.bar').style.display = 'none';
     document.querySelector('.numbers').style.display = 'flex';
 
     setTimeout(() => {
@@ -564,69 +614,107 @@ const select = (e) => {
     }, 0);
 }
 
-const showHintButton = () => {
+const showBar = (init = false) => {
+
+    console.log("SHOWBAR");
 
     let numbers = document.querySelector('.numbers');
-    let button = document.querySelector('.hint');
+    // let button = document.querySelector('.hint');
+    let bar = document.querySelector('.bar');
     
-    if (numbers.classList.contains('display')) return;
+    if (numbers.classList.contains('display') || bar.classList.contains('showbar')) return;
+
+    // console.log(getComputedStyle(bar).getPropertyValue(display));
     
     numbers.style.display = 'none';
-    button.style.display = 'grid';
-    button.style.visibility = 'visible';
-    button.classList.add('lamp');
+    // button.style.display = 'grid';
+    bar.style.display = 'flex';
 
-    button.addEventListener('animationend', e => {
+    bar.style.visibility = 'visible';
+    init ? bar.classList.add('showbarinit') : bar.classList.add('showbar');
 
-        let button = e.currentTarget;
+
+    bar.addEventListener('animationend', e => {
+
+        let bar = e.currentTarget;
 
         numbers.style.display = 'grid';
-        button.style.display = 'none';
+        bar.style.display = 'none';
 
         // button.style.display = 'none';
         // numbers.style.display = 'flex';
 
         // button.style.visibility = 'hidden';
-        button.classList.remove('lamp');
-        button.style.animationDuration = '';
+        bar.classList.remove('showbar', 'showbarinit');
+        bar.style.animationDuration = '';
 
     }, {once: true});
 }
 
 const clearHint = () => {
 
+    console.log("CLEARHINT");
+
+    clearInterval(interval);
+
     let cells = document.querySelectorAll('.cell');
+    // let event = new Event('transitionend');
+
+    let bar = document.querySelector('.bar');
+
+    bar.classList.remove('showbar', 'showbarinit');
 
     for (let cell of cells) {
         if (cell.classList.contains('correct') || cell.classList.contains('wrong')) {
             // cell.classList.remove('correct');
             cell.firstChild.innerText = '';
-            cell.style.animation = '';
-            cell.style.animationDuration = '';
-
+            // cell.style.animation = '';
+            cell.style.animationDuration = '0.0s';
+            // cell.dispatchEvent(event);
         }
 
-        cell.style.transition = `background-color 0s ease-in-out, font-weight 0s ease-in-out`;
-        cell.classList.remove('gray', 'bold', 'wrong','correct');
+        if (cell.classList.contains('wrong')) cell.classList.add('stopbar');
+
+        // cell.style.transition = `background-color 0s ease-in-out, font-weight 0s ease-in-out`;
+        // cell.style = '';
+
+        cell.style.transition = '';
+
+        // cell.removeAttribute('style');
+        cell.classList.remove('gray', 'bold', 'wrong','correct', 'pop');
     }
 }
 
 const showHint = (e) => {
+
+    console.log("SHOWHINT");
+
+    if (solved(board)) {
+        console.log(interval);
+        if (!interval) firework();
+        e.stopPropagation();
+        let bar = document.querySelector('.bar');
+        bar.style.animationDuration = '0.0s';
+
+        return;
+    }
+
+    clearHint();
 
     let cells = document.querySelectorAll('.cell');
     let [row, col, val, num, clues] = hints(board);
     let cell = cells[row * 9 + col];
     let delay = 0;
 
-    document.querySelector('.hint').style.animationDuration = '0s';
+    document.querySelector('.bar').style.animationDuration = '0s';
 
     let boxRow = Math.trunc(row / 3) * 3;
     let boxCol = Math.trunc(col / 3) * 3;
 
     // disableTouch();
-    disableHint();
+    // disableBar();
 
-    for (let clue of clues) {
+    for (let clue of clues.sort((a, b) => a - b)) {
 
         let boxRow2 = Math.trunc(Math.trunc(clue / 9) / 3) * 3;
         let boxCol2 = Math.trunc(clue % 9 / 3) * 3;
@@ -649,119 +737,141 @@ const showHint = (e) => {
                 break;
         }
 
-        // let i; 
+        let i = 1; 
 
         switch(type) {
+
             case 1:
                 console.log("ROW");
 
                 // i = 1;
 
-                // while (clue % 9 + i < 9 || clue % 9 - i >= 0) {
-                // // for (let i = 1; i < 9; i++) {
-                //     // if (i != clue % 9) cells[Math.trunc(clue / 9) * 9  + i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;   
-                //     // if (board[Math.trunc(clue / 9)][i] == 0) cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
-                //     // if (i != clue % 9) cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
-                //     // cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
+                while (clue % 9 + i < 9 || clue % 9 - i >= 0) {
+                // for (let i = 1; i < 9; i++) {
+                    // if (i != clue % 9) cells[Math.trunc(clue / 9) * 9  + i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;   
+                    // if (board[Math.trunc(clue / 9)][i] == 0) cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
+                    // if (i != clue % 9) cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
+                    // cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
 
-                //     if (clue % 9 + i < 9 && !cells[Math.trunc(clue / 9) * 9  + clue % 9 + i].classList.contains('gray')) {
-                //         cells[Math.trunc(clue / 9) * 9  + clue % 9 + i].classList.add('gray');
-                //         cells[Math.trunc(clue / 9) * 9  + clue % 9 + i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
-                //     }
-                    
-                //     if (clue % 9 - i >= 0 && !cells[Math.trunc(clue / 9) * 9  + clue % 9 - i].classList.contains('gray')) {
-                //         cells[Math.trunc(clue / 9) * 9  + clue % 9 - i].classList.add('gray');
-                //         cells[Math.trunc(clue / 9) * 9  + clue % 9 - i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
-                //     }
-
-                //     delay += 0.0;
-                //     i++;
-                // }
-
-                for (let i = 0; i < 9; i++) {
-                    if (i != clue % 9 && !cells[Math.trunc(clue / 9) * 9  + i].classList.contains('gray')) {
-                        cells[Math.trunc(clue / 9) * 9  + i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;   
-                        cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
+                    if (clue % 9 + i < 9 && !cells[Math.trunc(clue / 9) * 9  + clue % 9 + i].classList.contains('gray')) {
+                        cells[Math.trunc(clue / 9) * 9  + clue % 9 + i].classList.add('gray');
+                        cells[Math.trunc(clue / 9) * 9  + clue % 9 + i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
                     }
+                    
+                    if (clue % 9 - i >= 0 && !cells[Math.trunc(clue / 9) * 9  + clue % 9 - i].classList.contains('gray')) {
+                        cells[Math.trunc(clue / 9) * 9  + clue % 9 - i].classList.add('gray');
+                        cells[Math.trunc(clue / 9) * 9  + clue % 9 - i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
+                    }
+
+                    delay += 0.1;
+                    i++;
                 }
 
+                // for (let i = 0; i < 9; i++) {
+                //     if (i != clue % 9 && !cells[Math.trunc(clue / 9) * 9  + i].classList.contains('gray')) {
+                //         cells[Math.trunc(clue / 9) * 9  + i].style.transition = `background-color 0.5s ${delay}s ease-in-out`;   
+                //         cells[Math.trunc(clue / 9) * 9  + i].classList.add('gray');
+                //     }
+                // }
+
                 delay += 0.5;
+
                 break;
+
             case 2:
                 console.log("COL");
 
                 // i = 1;
 
-                // while (Math.trunc(clue / 9) + i < 9 || Math.trunc(clue / 9) - i >= 0) {
-                // // for (let i = 1; i < 9; i++) {
-                //     // if (i != Math.trunc(clue / 9)) cells[i * 9 + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;
-                //     // if (board[i][clue % 9] == 0) cells[i * 9 + clue % 9].classList.add('gray');
-                //     // if (i != Math.trunc(clue / 9)) cells[i * 9 + clue % 9].classList.add('gray');
-                //     // cells[i * 9 + clue % 9].classList.add('gray');
+                while (Math.trunc(clue / 9) + i < 9 || Math.trunc(clue / 9) - i >= 0) {
+                // for (let i = 1; i < 9; i++) {
+                    // if (i != Math.trunc(clue / 9)) cells[i * 9 + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;
+                    // if (board[i][clue % 9] == 0) cells[i * 9 + clue % 9].classList.add('gray');
+                    // if (i != Math.trunc(clue / 9)) cells[i * 9 + clue % 9].classList.add('gray');
+                    // cells[i * 9 + clue % 9].classList.add('gray');
 
-                //     if (Math.trunc(clue / 9) + i < 9 && !cells[(Math.trunc(clue / 9) + i) * 9  + clue % 9].classList.contains('gray')) {
-                //         cells[(Math.trunc(clue / 9) + i) * 9  + clue % 9].classList.add('gray');
-                //         cells[(Math.trunc(clue / 9) + i) * 9  + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
-                //     }
-                    
-                //     if (Math.trunc(clue / 9) - i >= 0 && !cells[(Math.trunc(clue / 9) - i) * 9  + clue % 9].classList.contains('gray')) {
-                //         cells[(Math.trunc(clue / 9) - i) * 9  + clue % 9].classList.add('gray');
-                //         cells[(Math.trunc(clue / 9) - i) * 9  + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
-                //     }
-
-                //     delay += 0.0;
-                //     i++;
-                // }
-
-                for (let i = 0; i < 9; i++) {
-                    if (i != Math.trunc(clue / 9) && !cells[i * 9 + clue % 9].classList.contains('gray')) {
-                        cells[i * 9 + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;   
-                        cells[i * 9 + clue % 9].classList.add('gray');
+                    if (Math.trunc(clue / 9) + i < 9 && !cells[(Math.trunc(clue / 9) + i) * 9  + clue % 9].classList.contains('gray')) {
+                        cells[(Math.trunc(clue / 9) + i) * 9  + clue % 9].classList.add('gray');
+                        cells[(Math.trunc(clue / 9) + i) * 9  + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
                     }
+                    
+                    if (Math.trunc(clue / 9) - i >= 0 && !cells[(Math.trunc(clue / 9) - i) * 9  + clue % 9].classList.contains('gray')) {
+                        cells[(Math.trunc(clue / 9) - i) * 9  + clue % 9].classList.add('gray');
+                        cells[(Math.trunc(clue / 9) - i) * 9  + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;  
+                    }
+
+                    delay += 0.1;
+                    i++;
                 }
+
+                // for (let i = 0; i < 9; i++) {
+                //     if (i != Math.trunc(clue / 9) && !cells[i * 9 + clue % 9].classList.contains('gray')) {
+                //         cells[i * 9 + clue % 9].style.transition = `background-color 0.5s ${delay}s ease-in-out`;   
+                //         cells[i * 9 + clue % 9].classList.add('gray');
+                //     }
+                // }
 
                 delay += 0.5;
 
                 break;
+
             case 3:
+
                 console.log("BOX");
 
-                // for (let i = 0; i < 9; i++) {
+                let offsets = [0,1,2,9,10,11,18,19,20]; 
 
-                //     let currentRow = boxRow2 + Math.trunc(i / 3);
-                //     let currrentCol = boxCol2 + i % 3;
+                // let sequences = [[3,1,6,4,2,7,5,8],
+                //                  [0,2,3,4,5,6,7,8],
+                //                  [1,5,0,4,8,3,7,6],
+                //                  [0,6,1,4,7,2,5,8],
+                //                  [0,1,2,3,5,6,7,8],
+                //                  [2,8,1,4,7,0,3,6],
+                //                  [3,7,0,4,8,1,5,2],
+                //                  [6,8,3,4,5,0,1,2],
+                //                  [7,5,6,4,2,3,1,0]];
 
-                //     if (currentRow != Math.trunc(clue / 9) || currrentCol != clue % 9) cells[currentRow * 9 + currrentCol].style.transition = `background-color 0.5s ${delay}s ease-in-out`;
-                //     // if (board[currentRow][currrentCol] == 0) cells[currentRow * 9 + currrentCol].classList.add('gray');
-                //     if (currentRow != Math.trunc(clue / 9) || currrentCol != clue % 9) cells[currentRow * 9 + currrentCol].classList.add('gray');
-                //     // cells[currentRow * 9 + currrentCol].classList.add('gray');
-                //     delay += 0.0;
+                let sequences = [[[3,1],[6,4,2],[7,5],[8]],
+                                 [[0,2],[3,4,5],[6,7,8]],
+                                 [[1,5],[0,4,8],[3,7],[6]],
+                                 [[0,6],[1,4,7],[2,5,8]],
+                                 [[0,1,2,3,5,6,7,8]],
+                                 [[2,8],[1,4,7],[0,3,6]],
+                                 [[3,7],[0,4,8],[1,5],[2]],
+                                 [[6,8],[3,4,5],[0,1,2]],
+                                 [[7,5],[6,4,2],[3,1],[0]]];
 
-                // }
+                let offset = offsets.indexOf(clue - (boxRow2 * 9 + boxCol2));
+                let sequence = sequences[offset];
 
-                for (let i = 0; i < 9; i++) {
+                console.log(boxRow2, boxCol2, clue, clue - (boxRow2 * 9 + boxCol2), offsets.indexOf(clue - (boxRow2 * 9 + boxCol2))); 
 
-                    let currentRow = boxRow2 + Math.trunc(i / 3);
-                    let currrentCol = boxCol2 + i % 3;
+                // for (let i of sequence) {
 
-                    if (currentRow != Math.trunc(clue / 9) || currrentCol != clue % 9 && !cells[currentRow * 9 + currrentCol].classList.contains('gray')) {
-                        cells[currentRow * 9 + currrentCol].style.transition = `background-color 0.5s ${delay}s ease-in-out`;   
-                        cells[currentRow * 9 + currrentCol].classList.add('gray');
+                for (let batch of sequence) {
+                    for (let i of batch) {
+                
+                        let currentRow = boxRow2 + Math.trunc(i / 3);
+                        let currrentCol = boxCol2 + i % 3;
+
+                        if (currentRow != Math.trunc(clue / 9) || currrentCol != clue % 9) cells[currentRow * 9 + currrentCol].style.transition = `background-color 0.5s ${delay}s ease-in-out`;
+                        if (currentRow != Math.trunc(clue / 9) || currrentCol != clue % 9) cells[currentRow * 9 + currrentCol].classList.add('gray');
                     }
+                    delay += 0.1;
                 }
+                // }
 
                 delay += 0.5;
 
                 break;
         }
-        // break;
     }
 
-    delay += 0.4;
+    // delay += 0.5;
 
     cell.firstChild.innerText = val;
 
-    cell.style.animation = `hint 1s 5 ease forwards`;
+    cell.style.animation = 'hint 1s 5 ease forwards';
     cell.style.animationDelay = `${delay}s`;
 
 
@@ -780,15 +890,24 @@ const showHint = (e) => {
         cell.style.animation = '';
         cell.style.animationDuration = '';
 
-        cells.forEach(cell => {
-            cell.style.transition = `background-color 0s ease-in-out, font-weight 0s ease-in-out`;
-            cell.classList.remove('gray')
+
+        document.querySelectorAll('.gray, .bold').forEach(el => {
+            el.style.transition = `background-color 0.2s ease-in-out, font-weight 0.2s ease-in-out`;
+            el.classList.remove('gray', 'bold');
         });
 
-        clues.forEach(clue => cells[clue].classList.remove('bold'));
+        // cells.forEach(cell => {
+        //     cell.style.transition = `background-color 0.2s ease-in-out, font-weight 0.2s ease-in-out`;
+        //     cell.classList.remove('gray')
+        // });
+
+        // clues.forEach(clue => cells[clue].classList.remove('bold'));
 
         // enableTouch();
-        enableHint();
+
+        console.log("SHOWHINT");
+
+        // enableBar();
 
     }, {once: true});
 
@@ -804,7 +923,7 @@ const selectDigit = (e) => {
     let digit = parseInt(e.currentTarget.innerText);
     let cells = document.querySelectorAll('.cell');
 
-    disableHint();
+    // disableBar();
 
     for (let cell of cells) {
         if (cell.classList.contains('select')) {
@@ -818,20 +937,30 @@ const selectDigit = (e) => {
             if (cell.dataset.val == digit) {
                 cell.classList.add('filled');
                 board[row][col] = digit;
-                if (!solved(board)) setTimeout(enableHint, 100);
+
+                console.log(cell);
+                saveBoard();
+                // if (!solved(board)) setTimeout(enableBar, 100);
             } else {
                 cell.classList.add('wrong');
 
+                cell.style.animation = `error 0.75s 3 ease forwards`;
+
+
                 cell.addEventListener('animationend', e => {
+
+                    console.log("WRONGEND");
 
                     let cell = e.currentTarget;
 
                     cell.classList.remove('wrong');
                     cell.firstChild.innerText = '';
+                    cell.style.animation = '';
                     cell.style.animationDuration = '';
 
-                    showHintButton();
-                    enableHint();
+                    if (!cell.classList.contains('stopbar')) showBar();
+                    cell.classList.remove('stopbar');
+                    // enableBar();
 
                 }, {once: true});
 
@@ -843,13 +972,25 @@ const selectDigit = (e) => {
 
     }
 
-    if (solved(board)) setTimeout(firework, 500);
+    if (solved(board)) {
+        clearStorage();
+        setTimeout(firework, 500)
+    };
+
+    e.stopPropagation();
 
     console.log(digit);
 }
 
-const reset = () => {
+const reset = (e) => {
 
+    clearHint();
+    localStorage.clear();
+
+    // e.stopPropagation();
+
+    // console.log(document.querySelector('.bar').classList.contains('showbar'));
+    document.querySelector('.bar').style.animationDuration = '0s';
     document.querySelector('.board').removeEventListener('touchstart', reset);
     document.querySelector('.board').removeEventListener('mousedown', reset);
 
@@ -858,21 +999,36 @@ const reset = () => {
         cell.firstChild.classList.remove('pop');
     });
 
-    initBoard();    
-    fill();
-    save(); 
-    remove();
-    fillBoard();
-    enableHint();
+    setTimeout(() => {
+
+        console.log("RELOAD");
+
+        initBoard();    
+        fill();
+        save(board); 
+        remove();
+        saveBoard();
+        fillBoard();
+        document.querySelector('.bar').style = '';
+    }, 50);
+
+    
+    // enableBar();
 }
 
 const firework = () => {
+    disableTouch();
 
     console.log('FIREWORK');
 
     let n = 0;
 
     let cells = document.querySelectorAll('.cell');
+
+    for (let cell of cells) {
+        cell.removeAttribute('style');
+    }
+
     let order = Array.from({length: 81}, (_, i) => i);
     order = shuffle(order);
     // console.log(cells);
@@ -881,15 +1037,24 @@ const firework = () => {
         if (n > 80){
             document.querySelector('.board').addEventListener('touchstart', reset);
             document.querySelector('.board').addEventListener('mousedown', reset);
-            clearInterval(popInterval);
+            clearInterval(interval);
+            interval = null;
+            // enableBar();
+            setTimeout(showBar, 1000);
+            enableTouch();
+
         } else {
             cells[order[n]].firstChild.classList.add('pop');
+            cells[order[n]].firstChild.addEventListener('animationend', e => {
+                let cell = e.currentTarget;
+                cell.classList.remove('pop');
+            });
+
             n++;
         }
     }
 
-    let  popInterval = setInterval(pop, 100);
-
+    interval = setInterval(pop, 100);
 }
 
 const eraser = (e) => {
@@ -939,34 +1104,55 @@ const enableDigits = () => {
 //     }
 // }
 
-const enableHint = () => {
+const reloadBtn = () => {
+
+    console.log("RELOAD");
+}
+
+const enableBar = () => {
+
+    let reload = document.querySelector('.reload');
+    let hint = document.querySelector('.hint');
 
     if (touchScreen()){
         document.body.addEventListener('touchstart', hintArea);
+        hint.addEventListener("touchstart", showHint);
+        reload.addEventListener("touchstart", reset);
     } else {
         document.body.addEventListener('mousedown', hintArea);
+        hint.addEventListener("mousedown", showHint);
+        reload.addEventListener("mousedown", reset);
     }
+
+    console.log("ENABLE BAR");
 }
 
-const disableHint = () => {
+const disableBar = () => {
+
+    let reload = document.querySelector('.reload');
+    let hint = document.querySelector('.hint');
 
     if (touchScreen()){
         document.body.removeEventListener('touchstart', hintArea);
+        hint.removeEventListener("touchstart", showHint);
+        reload.removeEventListener("touchstart", reset);
     } else {
         document.body.removeEventListener('mousedown', hintArea);
+        hint.removeEventListener("mousedown", showHint);
+        reload.removeEventListener("mousedown", reset);
     }
 }
 
-const enableEraser = () => {
+// const enableEraser = () => {
 
-    let x = document.querySelector('.x');
+//     let x = document.querySelector('.x');
 
-        if (touchScreen()){
-            x.addEventListener("touchstart", showHint);
-        } else {
-            x.addEventListener("mousedown", showHint);
-        }
-}
+//         if (touchScreen()){
+//             x.addEventListener("touchstart", showHint);
+//         } else {
+//             x.addEventListener("mousedown", showHint);
+//         }
+// }
 
 // const disableEraser = () => {
 
@@ -999,18 +1185,22 @@ const hintArea = (e) => {
 
     let top = board.offsetTop - cell.offsetHeight * 2;
     let bottom = board.offsetTop;
-    let y;
+    let left = board.offsetLeft;
+    let right = board.offsetLeft + board.offsetWidth;
+    let x, y;
 
     if (touchScreen()) {
         // console.log(e.touches[0].clientX);
         // console.log(e.touches[0].clientY);
 
+        x = e.touches[e.touches.length - 1].clientX;
         y = e.touches[e.touches.length - 1].clientY;
 
     } else {
         // console.log(e.clientX);
         // console.log(e.clientY);
 
+        x = e.clientX;
         y = e.clientY;
 
     }
@@ -1021,7 +1211,7 @@ const hintArea = (e) => {
 
     // console.log(board.offsetTop);
 
-    if (y < bottom && y > top) showHintButton();
+    if (x > left && x < right && y < bottom && y > top) showBar();
 }
 
 const enableTouch = () => {
@@ -1050,17 +1240,38 @@ const disableTouch = () => {
     }
 }
 
+const initBar = () => {
+
+    document.querySelector('body').addEventListener('transitionend', e => {
+        
+        console.log("HELLO");
+    });
+
+}
+
+const aiPlay = () => {
+    return true;
+}
+
 const init = () => {
+
+    // window.addEventListener('visibilitychange', () => {
+    //     if (document.hidden) win() ? reset() : clearHint();
+    // }, false);
 
     disableTapZoom();
     setBoardSize();
+
+
     initBoard();
     
     let t0 = performance.now();
 
     fill();
 
-    save(); 
+    // saveBoard();
+
+    save(board); 
 
     let t1 = performance.now();
 
@@ -1068,23 +1279,47 @@ const init = () => {
 
     let t2 = performance.now();
 
+    // console.log(board.map(arr => arr.slice()));
+
+    // console.log(checkStorage());
+
+    checkStorage();
+
+    saveBoard();
+
+
+    // console.log(board.map(arr => arr.slice()));
+
+
+    // save(); 
+
+    // console.table(board);
+
     fillBoard();
 
-    showBoard();
+    // setTimeout(() => {
 
-    enableTouch();
-    enableDigits();
-    enableEraser();
-    enableHint();
+        showBoard();
 
-    solvable(true, true);
+        initBar();
+
+        setTimeout(showBar, 1000, true);
 
 
-    console.table(board);
+        enableTouch();
+        enableDigits();
+        // enableEraser();
+        enableBar();
 
-    console.log(t1 - t0);
-    console.log(t2 - t1);
-    console.log(count(board));
+        solvable(true, true);
+
+
+        console.table(board);
+
+        console.log(t1 - t0);
+        console.log(t2 - t1);
+        console.log(count(board));
+    // }, 500);
 }
 
 window.onload = () => document.fonts.ready.then(init());
