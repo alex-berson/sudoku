@@ -10,9 +10,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="google" content="notranslate">
 
-
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <script src="js/hint.js" defer></script>
+    <script src="js/prevew.js" defer></script>
+    <script src="js/data.js" defer></script>
     <script src="js/sudoku.js" defer></script>
 </head>
 <body class="noselect">
@@ -20,13 +20,13 @@
         <div id="middle">
             <div id ="inner">
                 <header>
-                    <h1>
-                        Sudoku
-                    </h1>
+                    <h1>Sudoku</h1>
                 </header>
                 <main>
                     <div class="numbers"><div class="number">1</div><div class="number">2</div><div class="number">3</div><div class="number">4</div><div class="number">5</div><div class="number">6</div><div class="number">7</div><div class="number">8</div><div class="number">9</div></div>
-                    <div class="bar"><div class="reload"><img src="images/refresh.svg" alt=""></div><div class="hint"><img src="images/lightbulb.svg" alt=""></div></div>
+                    <div class="bar"><div class="reload"><img id="img1" src="images/rotate-solid.svg" alt=""></div><div class="hint"><img id="img2" src="images/lightbulb.svg" alt=""></div></div>
+                    <!-- <div class="bar"><div class="reload"><img id="img1" src="images/rotate-solid.svg" alt=""></div><div class="hint">?</div></div> -->
+
                     <!-- <div class="choice"><div class="reload"><img src="images/refresh.svg" alt=""></div><div class="continue"><img src="images/lightbulb.svg" alt=""></div></div> -->
                     <!-- <div class="hint"><div class="x">?</div></div> -->
                     <div class="board">
@@ -111,96 +111,6 @@
                         <div class="cell"><div class="digit"></div></div>
                         <div class="cell"><div class="digit"></div></div>
                         <div class="cell"><div class="digit"></div></div>
-
-
-
-
-
-
-
-
-
-                      <!-- <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>
-                        <div class="cell"></div>                         -->
                 </main>
                 <footer>
                     <div id="designed">Designed by Alexander Berson</div>

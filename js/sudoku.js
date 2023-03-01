@@ -1,6 +1,11 @@
 let board;
 let nClues = 28;
 let interval;
+let hidden = [];
+
+let startTime; //
+let times = []; //
+// let x, y;
 
 // let board = [
 //         [0,0,3,0,2,0,6,0,0],
@@ -62,60 +67,50 @@ let interval;
 //     [4,0,0,0,0,6,1,9,2]
 // ];
 
+
+
 const initBoard = () => {
 
     board = [[0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0]];
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0]];
+
+    // board = [[0,0,0,5,2,6,0,0,3],
+    //          [0,0,0,7,0,0,1,0,0],
+    //          [0,3,0,0,8,0,0,0,5],
+    //          [7,0,0,0,4,0,9,0,6],
+    //          [0,0,0,0,0,0,2,0,0],
+    //          [0,5,9,8,0,7,0,0,0],
+    //          [0,9,7,3,0,0,0,0,0],
+    //          [3,0,0,0,0,0,0,0,7],
+    //          [0,4,0,0,0,0,0,0,1]];
+
+        // board = [[4, 5, 7, 1, 6, 8, 9, 2, 3],
+        //          [6, 2, 8, 3, 7, 9, 5, 1, 4],
+        //          [3, 9, 1, 5, 2, 4, 8, 6, 7],
+        //          [1, 6, 9, 2, 5, 3, 4, 7, 8],
+        //          [7, 3, 2, 8, 4, 6, 1, 5, 9],
+        //          [8, 4, 5, 9, 1, 7, 2, 3, 6],
+        //          [5, 8, 6, 4, 3, 1, 7, 9, 2],
+        //          [2, 7, 4, 6, 9, 5, 3, 0, 1],
+        //          [9, 1, 3, 7, 8, 2, 6, 4, 5]];
+
+
 }
 
 const showBoard = () => document.body.style.opacity = 1;
 
 const touchScreen = () => matchMedia('(hover: none)').matches;
 
-const saveBoard = () => {
+const clearStorage = () => localStorage.clear();
 
-    if (localStorage.getItem('solved') == null) {
-        let solved = solve();
-        localStorage.setItem('solved', JSON.stringify(solved))
-    }
-    
-    localStorage.setItem('board', JSON.stringify(board))
-};
-
-// const loadBoard = () => board = JSON.parse(localStorage.getItem('board'));
-
-const checkStorage = () => {
-
-    if (localStorage.getItem('board') != null) {
-
-        let solved = JSON.parse(localStorage.getItem('solved'));
-
-        board = JSON.parse(localStorage.getItem('board'));
-
-        save(solved);
-    }
-
-};
-
-const clearStorage = () => {
-    localStorage.clear();
-}
-
-const cellCoords = (touchedCell) => {
-
-    let cells = document.querySelectorAll('.cell');
-
-    for (let [i, cell] of cells.entries()) {
-        if (cell == touchedCell) return [Math.floor(i / 9), i % 9];
-    }
-}
+const minArray = (arrays) => arrays.reduce((prev, next) => prev.length > next.length ? next : prev);
 
 const setBoardSize = () => {
 
@@ -130,6 +125,48 @@ const setBoardSize = () => {
     document.documentElement.style.setProperty('--board-size', boardSize + 'px');
 }
 
+const saveBoard = () => {
+
+    // if (localStorage.getItem('solved') == null) {
+    //     let solved = solve();
+    //     localStorage.setItem('solved', JSON.stringify(solved))
+    // }
+    
+    localStorage.setItem('board', JSON.stringify(board))
+};
+
+// const loadBoard = () => board = JSON.parse(localStorage.getItem('board'));
+
+const checkStorage = () => {
+
+    // if (localStorage.getItem('board') != null) {
+
+    //     let solved = JSON.parse(localStorage.getItem('solved'));
+
+    //     board = JSON.parse(localStorage.getItem('board'));
+
+    //     saveFilled(solved);
+    // }
+
+     if (localStorage.getItem('board') != null) {
+
+        board = JSON.parse(localStorage.getItem('board'));
+
+        let solved = solve();
+
+        saveFilled(solved);
+    }
+};
+
+const cellCoords = (touchedCell) => {
+
+    let cells = document.querySelectorAll('.cell');
+
+    for (let [i, cell] of cells.entries()) {
+        if (cell == touchedCell) return [Math.trunc(i / 9), i % 9];
+    }
+}
+
 const shuffle = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
         let j = Math.trunc(Math.random() * (i + 1));
@@ -138,6 +175,22 @@ const shuffle = (array) => {
 
     return array;
 }
+
+const permuteArrays = (arrays) => {
+
+    if (arrays.length == 0) return [[]];
+  
+      let result = [];
+
+      arrays[0].forEach(el =>  {
+
+        let rest = permuteArrays(arrays.slice(1));
+
+        rest.forEach(permutation => result.push([...new Set([el].concat(permutation))]));
+      });
+
+      return result.sort((a, b) => a - b);
+  }
 
 const solved = (board) => {
 
@@ -149,7 +202,7 @@ const solved = (board) => {
     return true;
 }
 
-const count = (board) => {
+const countFilled = () => {
 
     let n = 0;
 
@@ -162,17 +215,16 @@ const count = (board) => {
     return n;
 }
 
+const validDigit = (board, row, col, val) => {
 
-const valid = (board, row, col, val) => {
-
-    let boxRow = Math.floor(row / 3) * 3;
-    let boxCol = Math.floor(col / 3) * 3;
+    let boxRow = Math.trunc(row / 3) * 3;
+    let boxCol = Math.trunc(col / 3) * 3;
 
     for (let i = 0; i < 9; i++) {
 
         if (board[row][i] == val || board[i][col] == val) return false;
 
-        let currentRow = boxRow + Math.floor(i / 3);
+        let currentRow = boxRow + Math.trunc(i / 3);
         let currrentCol = boxCol + i % 3;
 
         if (board[currentRow][currrentCol] == val) return false;
@@ -181,7 +233,7 @@ const valid = (board, row, col, val) => {
     return true;
 }
 
-const rows = (board) => {
+const checkRows = (board, hint = false) => {
 
     for (let row = 0; row < 9; row++) {
         outer: for (let val = 1; val <= 9; val++) {
@@ -190,21 +242,26 @@ const rows = (board) => {
 
             for (let col = 0; col < 9; col++) {
 
-                if (board[row][col] != 0 || !valid(board, row, col, val)) continue;
+                if (board[row][col] != 0 || !validDigit(board, row, col, val)) continue;
 
                 if (r != undefined) continue outer;
 
                 [r, c] = [row, col];
             }
 
-            if (r != undefined) return [r, c, val, 1];
+            // if (r != undefined) return [r, c, val, 'row'];
+            if (r != undefined) {
+                if (!hint) return [r, c, val, 'row'];
+                hidden.push([r, c, val, 'row'])
+            }
         }
     }
 
     return [null, null, null, null];
 }
 
-const cols = (board) => {
+
+const checkCols = (board, hint = false) => {
 
     for (let col = 0; col < 9; col++) {
         outer: for (let val = 1; val <= 9; val++) {
@@ -213,77 +270,89 @@ const cols = (board) => {
 
             for (let row = 0; row < 9; row++) {
 
-                if (board[row][col] != 0 || !valid(board, row, col, val)) continue;
+                if (board[row][col] != 0 || !validDigit(board, row, col, val)) continue;
 
                 if (r != undefined) continue outer;
 
                 [r, c] = [row, col];
             }
 
-            if (r != undefined) return [r, c, val, 2];
+            // if (r != undefined) return [r, c, val, 'col'];
+            if (r != undefined) {
+                if (!hint) return [r, c, val, 'col'];
+                hidden.push([r, c, val, 'col'])
+            }
         }
     }
 
     return [null, null, null, null];
 }
 
-const boxes = (board) => {
+const checkBoxes = (board, hint = false) => {
 
     for (let sq = 0; sq < 9; sq++) {
         outer: for (let val = 1; val <= 9; val++) {
 
             let r, c; 
-            let boxRow = Math.floor(sq / 3) * 3;
-            let boxCol = Math.floor(sq % 3) * 3;
+            let boxRow = Math.trunc(sq / 3) * 3;
+            let boxCol = sq % 3 * 3;
 
             for (let cell = 0; cell < 9; cell++) {
 
-                let row = boxRow + Math.floor(cell / 3);
+                let row = boxRow + Math.trunc(cell / 3);
                 let col = boxCol + cell % 3;
 
-                if (board[row][col] != 0 || !valid(board, row, col, val)) continue;
+                if (board[row][col] != 0 || !validDigit(board, row, col, val)) continue;
 
                 if (r != undefined) continue outer;
 
                 [r, c] = [row, col];
             }
 
-            if (r != undefined) return [r, c, val, 3];
+            // if (r != undefined) return [r, c, val, 'box'];
+            if (r != undefined) {
+                if (!hint) return [r, c, val, 'box'];
+                hidden.push([r, c, val, 'box'])
+            }
         }
     }
 
     return [null, null, null, null];
 }
 
-// const cells = (board) => {
+const checkCells = (board, hint = false) => {
 
-//     for (let row = 0; row < 9; row++) {
-//         outer: for (let col = 0; col < 9; col++) {
+    for (let row = 0; row < 9; row++) {
+        outer: for (let col = 0; col < 9; col++) {
 
-//             if (board[row][col] != 0) continue;
+            if (board[row][col] != 0) continue;
 
-//             let v;
+            let v;
 
-//             for (let val = 1; val <= 9; val++) {
+            for (let val = 1; val <= 9; val++) {
 
-//                 if (valid(board, row, col, val)) {
+                if (validDigit(board, row, col, val)) {
 
-//                     if (v != undefined) continue outer;
+                    if (v != undefined) continue outer;
 
-//                     v = val;
-//                 }
-//             }
+                    v = val;
+                }
+            }
 
-//             if (v != undefined) return [row, col, v, 4];
-//         }
-//     }   
+            // if (v != undefined) return [row, col, v, 4];
+            if (v != undefined) {
+                if (!hint) return [row, col, v, 'cell'];
+                hidden.push([row, col, v, 'cell'])
+            }
+        }
+    }   
 
-//     return [null, null, null, null];
-// }
+    return [null, null, null, null];
+}
 
-const find = (board, final = false) => {
+const findDigit = (board) => {
 
-    let row, col, val, num;
+    let row, col, val, type;
 
     // let nines = [squares, rows, cols];
 
@@ -294,22 +363,22 @@ const find = (board, final = false) => {
     //     if (row != undefined) return [row, col, val, num];
     // }
 
-    [row, col, val, num] = boxes(board);
-    if (row != undefined) return [row, col, val, num];
+    [row, col, val, type] = checkBoxes(board);
+    if (row != undefined) return [row, col, val, type];
 
-    [row, col, val, num] = rows(board);
-    if (row != undefined) return [row, col, val, num];
+    [row, col, val, type] = checkRows(board);
+    if (row != undefined) return [row, col, val, type];
 
-    [row, col, val, num] = cols(board);
-    if (row != undefined) return [row, col, val, num];
+    [row, col, val, type] = checkCols(board);
+    if (row != undefined) return [row, col, val, type];
 
-    // [row, col, val, num] = cells(board);
-    // if (row != undefined) return [row, col, val, num];
+    // [row, col, val, type] = checkCells(board);
+    // if (row != undefined) return [row, col, val, type];
 
     return [null, null, null, null];
 }
 
-const fill = () => {
+const fillGrid = () => {
 
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
@@ -322,13 +391,13 @@ const fill = () => {
 
             for (let i of shuffle([1,2,3,4,5,6,7,8,9])) {
             
-                // if (valid(board, row, col, i)) {
-                if (!valid(board, row, col, i)) continue;
+                // if (validDigit(board, row, col, i)) {
+                if (!validDigit(board, row, col, i)) continue;
 
                 // board[row][col] = i;
                 board[row][col] = i;
 
-                if (fill()) return true;
+                if (fillGrid()) return true;
 
                 board[row][col] = 0;
 
@@ -345,12 +414,16 @@ const fill = () => {
     return true;
 }
 
-const save = (board) => {
+const saveFilled = (board) => {
 
     let cells = document.querySelectorAll('.cell');
 
+    console.log(board);
+
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
+
+            console.log(row, col,  board[row][col]);
 
             cells[row * 9 + col].dataset.val = board[row][col];
             // cells[row * 9 + col].innerText = board[row][col];
@@ -359,7 +432,7 @@ const save = (board) => {
     }
 }
 
-const remove = () => {
+const removeDigits = () => {
 
     let cells = Array.from({length: 81}, (_, i) => i);
 
@@ -370,11 +443,14 @@ const remove = () => {
     for (let i = 0; i < 81; i++) {
 
         let cell = cells[i];
-        let row = Math.floor(cell / 9);
+        let row = Math.trunc(cell / 9);
         let col = cell % 9;
         let val = board[row][col];
 
-        if (count(board) == nClues) break;
+        // if (countFilled() == Math.ceil(Math.E * 10)) break;
+                
+        // if (countFilled() == 80) break;
+
         
         board[row][col] = 0;
 
@@ -382,17 +458,19 @@ const remove = () => {
 
         board[row][col] = val;
     }
+
+    console.log("CLUES: ", countFilled());
 }
 
-const solvable = (steps = false, final = false) => {
+const solvable = (steps = false) => {
 
     let tempBoard = board.map(arr => arr.slice());
 
     do {
 
-        let [row, col, val, num] = find(tempBoard, final);
+        let [row, col, val, type] = findDigit(tempBoard);
 
-        if (steps) console.log(row, col, val, num);
+        if (steps) console.log(row, col, val, type);
 
         if (row == null) return false;
 
@@ -405,13 +483,13 @@ const solvable = (steps = false, final = false) => {
     return true;
 }
 
-const solve = (final = false) => {
+const solve = () => {
 
     let tempBoard = board.map(arr => arr.slice());
 
     do {
 
-        let [row, col, val, num] = find(tempBoard, final);
+        let [row, col, val, type] = findDigit(tempBoard);
 
         if (row == null) return false;
 
@@ -445,101 +523,12 @@ const fillBoard = () => {
     });
 }
 
-// const checkRow = (row, col, val) => {
-
-//     console.log(' ');
-
-//     for (let i = 0; i < 9; i++) {
-
-//         if (i == col || board[row][i] != 0) continue;
-
-//         console.log('row: ', row, i, valid(board, row, i, val));
-
-//         if (valid(board, row, i, val)) return false;
-//     }
-
-//     console.log('ROW');
-
-//     return true;
-// }
-
-// const checkCol = (row, col, val) => {
-
-//     console.log(' ');
-
-//     for (let i = 0; i < 9; i++) {
-
-//         if (i == row || board[i][col] != 0) continue;
-
-//         console.log('col: ', i, col, valid(board, i, col, val));
-
-//         if (valid(board, i, col, val)) return false;
-//     }
-//     console.log('COL');
-
-
-//     return true;
-// }
-
-// const checkSquare = (row, col, val) => {
-
-//     let boxRow = Math.floor(row / 3) * 3;
-//     let boxCol = Math.floor(col / 3) * 3;
-
-//     console.log(' ');
-
-
-
-//     for (let i = 0; i < 9; i++) {
-
-
-//         let r = boxRow + Math.floor(i / 3);
-//         let c = boxCol + Math.floor(i % 3);
-
-//         if (r == row && c == col || board[r][c] != 0) continue;
-
-//         console.log('sq: ', r, c, valid(board, r, c, val));
-
-//         if (valid(board, r, c, val)) return false;
-//     }
-
-//     console.log('SQ');
-
-
-//     return true;
-// }
-
-// const checkCell = (row, col, val) => {
-
-//     console.log(' ');
-
-
-//     for (i = 1; i <= 9; i++) {
-
-//         if (i == val) continue;
-
-//         if (valid(board, row, col, val)) return false;
-//     }
-
-//     console.log('CELL');
-
-//     return true;
-// }
-
-// const logic = (row, col, val) => {
-
-//     if (checkRow(row, col, val) || checkCol(row, col, val) || checkSquare(row, col, val) || checkCell(row, col, val)) return true;
-
-//     // if (checkRow(row, col, val)) return true;
-
-
-//     return false;
-// }
-
-const select = (e) => {
+const selectCell = (e) => {
 
     let cell = e.currentTarget;
     let cells = document.querySelectorAll('.cell');
+    let bar = document.querySelector('.bar');
+    let numbers = document.querySelector('.numbers');
 
     // console.table(board);
 
@@ -548,25 +537,33 @@ const select = (e) => {
 
     console.log(e.currentTarget);
 
-    // if (cell.classList.contains('correct') || cell.classList.contains('wrong')) {
+    // if (cell.classList.contains('correct') || cell.classList.contains('incorrect')) {
         // cell.style.animationDuration = '0.1s'
     // }
 
     let [row, col] = cellCoords(cell);
 
-    let val = parseInt(cell.dataset.val);
+    let val = Number(cell.dataset.val);
 
     console.log(row, col, val);
 
     // logic(row, col, val) ? cell.classList.add('green') : cell.classList.add('red');
 
     if (cell.classList.contains('filled')) { 
+
+        console.log("FILLED");
+
+        // if (bar.classList.contains('showbarinit') || bar.classList.contains('showbar')) return;
+
         for (let cell of cells) {
             cell.classList.remove('select');
         }
 
-        document.querySelector('.numbers').classList.remove('display');
-        document.querySelector('.bar').classList.remove('display');
+        numbers.classList.remove('display');
+        bar.classList.remove('showbarinit', 'showbar');
+        bar.style.display = 'none';
+        numbers.style.display = 'flex';
+        bar.style.animationDuration = '';
 
         // disableDigits();
         // disableEraser();
@@ -575,8 +572,8 @@ const select = (e) => {
 
     if (cell.classList.contains('select')) {
         cell.classList.remove('select');
-        document.querySelector('.numbers').classList.remove('display');
-        document.querySelector('.bar').classList.remove('display');
+        numbers.classList.remove('display');
+        bar.classList.remove('showbarinit', 'showbar');
         // disableDigits();
         // disableEraser();
 
@@ -590,7 +587,7 @@ const select = (e) => {
     cell.classList.add('select');
 
     document.querySelector('.numbers').classList.remove('display');
-    document.querySelector('.bar').classList.remove('display');
+    document.querySelector('.bar').classList.remove('showbar', 'showbarinit');
 
     // if (cell.classList.contains('red')) {
 
@@ -605,24 +602,29 @@ const select = (e) => {
     //     return;  
     // }
 
-    document.querySelector('.bar').style.display = 'none';
-    document.querySelector('.numbers').style.display = 'flex';
+    bar.style.display = 'none';
+    numbers.style.display = 'flex';
 
-    setTimeout(() => {
-        document.querySelector('.numbers').classList.add('display');   
-        // enableDigits();             
-    }, 0);
+    setTimeout(() => document.querySelector('.numbers').classList.add('display'), 0);
 }
 
-const showBar = (init = false) => {
+const showBar = ({auto = false} = {}) => {
 
-    console.log("SHOWBAR");
+    console.log("SHOWBAR", auto);
 
+    // let event = new Event('mousemove');
     let numbers = document.querySelector('.numbers');
     // let button = document.querySelector('.hint');
     let bar = document.querySelector('.bar');
+
+    if (aiMode()) bar.style.animationDuration = '';
     
-    if (numbers.classList.contains('display') || bar.classList.contains('showbar')) return;
+    if (numbers.classList.contains('display') || bar.classList.contains('showbar') || bar.classList.contains('showbarinit')) return;
+
+    // if (numbers.classList.contains('display')) return;
+
+
+    console.log("SHOWBAR2");
 
     // console.log(getComputedStyle(bar).getPropertyValue(display));
     
@@ -631,14 +633,19 @@ const showBar = (init = false) => {
     bar.style.display = 'flex';
 
     bar.style.visibility = 'visible';
-    init ? bar.classList.add('showbarinit') : bar.classList.add('showbar');
 
+    auto ? bar.classList.add('showbarinit') : bar.classList.add('showbar');
+
+    // if (bar.classList.contains ('showbar')) console.log("CONTAINS");
+
+    // document.dispatchEvent(event);
 
     bar.addEventListener('animationend', e => {
 
         let bar = e.currentTarget;
+        // let event = new Event('mousemove');
 
-        numbers.style.display = 'grid';
+        numbers.style.display = 'flex';
         bar.style.display = 'none';
 
         // button.style.display = 'none';
@@ -647,13 +654,14 @@ const showBar = (init = false) => {
         // button.style.visibility = 'hidden';
         bar.classList.remove('showbar', 'showbarinit');
         bar.style.animationDuration = '';
+        // document.dispatchEvent(event);
 
     }, {once: true});
 }
 
 const clearHint = () => {
 
-    console.log("CLEARHINT");
+    // console.log("CLEARHINT");
 
     clearInterval(interval);
 
@@ -662,18 +670,21 @@ const clearHint = () => {
 
     let bar = document.querySelector('.bar');
 
-    bar.classList.remove('showbar', 'showbarinit');
+    setTimeout(() => bar.classList.remove('showbar', 'showbarinit'), 10);
+
+    // bar.classList.remove('showbar', 'showbarinit');
 
     for (let cell of cells) {
-        if (cell.classList.contains('correct') || cell.classList.contains('wrong')) {
+        if (cell.classList.contains('correct') || cell.classList.contains('incorrect')) {
             // cell.classList.remove('correct');
             cell.firstChild.innerText = '';
             // cell.style.animation = '';
             cell.style.animationDuration = '0.0s';
+            cell.style.animationDelay = '0.0s';
             // cell.dispatchEvent(event);
         }
 
-        if (cell.classList.contains('wrong')) cell.classList.add('stopbar');
+        if (cell.classList.contains('incorrect')) cell.classList.add('stopbar');
 
         // cell.style.transition = `background-color 0s ease-in-out, font-weight 0s ease-in-out`;
         // cell.style = '';
@@ -681,32 +692,41 @@ const clearHint = () => {
         cell.style.transition = '';
 
         // cell.removeAttribute('style');
-        cell.classList.remove('gray', 'bold', 'wrong','correct', 'pop');
+        cell.classList.remove('gray', 'bold', 'incorrect','correct', 'pop');
     }
 }
 
 const showHint = (e) => {
 
-    console.log("SHOWHINT");
+    let bar = document.querySelector('.bar');
+
+    // document.querySelector('.bar').classList.remove('showbar', 'showbarinit');
+
+    // console.log("SHOWHINT");
+
+    // document.querySelector('.bar').classList.remove('showbar', 'showbarinit');
+
 
     if (solved(board)) {
-        console.log(interval);
+        // console.log(interval);
         if (!interval) firework();
-        e.stopPropagation();
-        let bar = document.querySelector('.bar');
+        // if (!aiMode()) e.stopPropagation();
+
+        // let bar = document.querySelector('.bar');
         bar.style.animationDuration = '0.0s';
 
         return;
     }
 
     clearHint();
+    // setTimeout(() => bar.classList.remove('showbar', 'showbarinit'), 10);
 
     let cells = document.querySelectorAll('.cell');
-    let [row, col, val, num, clues] = hints(board);
+    let [row, col, val, type, clues] = hint();
     let cell = cells[row * 9 + col];
     let delay = 0;
 
-    document.querySelector('.bar').style.animationDuration = '0s';
+    bar.style.animationDuration = '0s';
 
     let boxRow = Math.trunc(row / 3) * 3;
     let boxCol = Math.trunc(col / 3) * 3;
@@ -718,30 +738,30 @@ const showHint = (e) => {
 
         let boxRow2 = Math.trunc(Math.trunc(clue / 9) / 3) * 3;
         let boxCol2 = Math.trunc(clue % 9 / 3) * 3;
-        let type;
+        let type2;
 
         cells[clue].style.transition = `font-weight 0.5s ${delay}s ease-in-out`;
         cells[clue].classList.add('bold');
 
         delay += 0.5;
 
-        switch(num) {
-            case 1:
-                type = boxRow == boxRow2 ? 3 : 2;
+        switch(type) {
+            case 'row':
+                type2 = boxRow == boxRow2 ? 'box' : 'col';
                 break;
-            case 2:
-                type = boxCol== boxCol2 ? 3 : 1;
+            case 'col':
+                type2 = boxCol== boxCol2 ? 'box' : 'row';
                 break;
-            case 3:
-                type = boxRow == boxRow2 ? 1 : 2;
+            case 'box':
+                type2 = boxRow == boxRow2 ? 'row' : 'col';
                 break;
         }
 
         let i = 1; 
 
-        switch(type) {
+        switch(type2) {
 
-            case 1:
+            case 'row':
                 console.log("ROW");
 
                 // i = 1;
@@ -778,7 +798,7 @@ const showHint = (e) => {
 
                 break;
 
-            case 2:
+            case 'col':
                 console.log("COL");
 
                 // i = 1;
@@ -815,7 +835,7 @@ const showHint = (e) => {
 
                 break;
 
-            case 3:
+            case 'box':
 
                 console.log("BOX");
 
@@ -871,7 +891,15 @@ const showHint = (e) => {
 
     cell.firstChild.innerText = val;
 
-    cell.style.animation = 'hint 1s 5 ease forwards';
+    let repeats = aiMode() ? 4.37 : 5;
+
+    // repeats = 3;
+
+
+    // cell.style.animation = 'hint 1s 5 ease forwards';
+
+    cell.style.animation = `correct 0.75s ${repeats} ease forwards`;
+
     cell.style.animationDelay = `${delay}s`;
 
 
@@ -882,6 +910,8 @@ const showHint = (e) => {
     // shadeSquares(row, col, val, num, clues);
             
     cell.addEventListener('animationend', e => {
+
+        console.log("HINT ANI END");
 
         let cell = e.currentTarget;
 
@@ -896,6 +926,15 @@ const showHint = (e) => {
             el.classList.remove('gray', 'bold');
         });
 
+        if (aiMode()) {
+            cell.firstChild.innerText = val;
+            cell.classList.add('filled');
+            board[row][col] = val;
+            solved(board) ? showHint() : setTimeout(showHint, 500);
+        }
+
+
+
         // cells.forEach(cell => {
         //     cell.style.transition = `background-color 0.2s ease-in-out, font-weight 0.2s ease-in-out`;
         //     cell.classList.remove('gray')
@@ -905,9 +944,10 @@ const showHint = (e) => {
 
         // enableTouch();
 
-        console.log("SHOWHINT");
+        // console.log("SHOWHINT");
 
         // enableBar();
+
 
     }, {once: true});
 
@@ -917,13 +957,149 @@ const showHint = (e) => {
     // hints(board);
 }
 
+const rowClues = (row, col, val) => {
+
+    // console.log(row, col, val);
+
+    let clues = [];
+
+    for (let i = 0; i < 9; i++) {
+
+        if (board[row][i] != 0) continue;
+
+        let boxRow = Math.trunc(row / 3) * 3;
+        let boxCol = Math.trunc(i / 3) * 3;
+        let squareClues = [];
+
+        for (let j = 0; j < 9; j++) {
+
+            let currentRow = boxRow + Math.trunc(j / 3);
+            let currrentCol = boxCol + j % 3;
+
+            if (board[currentRow][currrentCol] == val) squareClues.push(currentRow * 9 + currrentCol);
+            if (board[j][i] == val) squareClues.push(j * 9 + i);
+        }
+
+        if (squareClues.length != 0) clues.push(squareClues);
+    }
+
+    return clues;
+}
+
+const colClues = (row, col, val) => {
+
+    // console.log(row, col, val);
+
+    let clues = [];
+
+    for (let i = 0; i < 9; i++) {
+
+        if (board[i][col] != 0) continue;
+
+        let boxRow = Math.trunc(i / 3) * 3;
+        let boxCol = Math.trunc(col / 3) * 3;
+        let squareClues = [];
+
+        for (let j = 0; j < 9; j++) {
+
+            let currentRow = boxRow + Math.trunc(j / 3);
+            let currrentCol = boxCol + j % 3;
+
+            if (board[currentRow][currrentCol] == val) squareClues.push(currentRow * 9 + currrentCol);
+            if (board[i][j] == val) squareClues.push(i * 9 + j);
+        }
+
+        if (squareClues.length != 0) clues.push(squareClues);
+    }
+
+    return clues;
+}
+
+const boxClues = (row, col, val) => {
+
+    // console.log(row, col, val);
+
+    let clues = [];
+    let boxRow = Math.trunc(row / 3) * 3;
+    let boxCol = Math.trunc(col / 3) * 3;
+
+    for (let i = 0; i < 9; i++) {
+
+        let squareClues = [];
+        let currentRow = boxRow + Math.trunc(i / 3);
+        let currrentCol = boxCol + i % 3;
+
+        if (board[currentRow][currrentCol] != 0) continue;
+
+        for (let j = 0; j < 9; j++) {
+            if (board[currentRow][j] == val) squareClues.push(currentRow * 9 + j);
+            if (board[j][currrentCol] == val) squareClues.push(j * 9 + currrentCol);
+        }
+
+        if (squareClues.length != 0) clues.push(squareClues);
+    }
+
+    return clues;
+}
+
+const hint = () => {
+
+    hidden = [];
+
+    checkBoxes(board, true);
+    checkRows(board, true);
+    checkCols(board, true);
+    // checkCells(board, true);
+
+
+    // console.log(singles);
+
+    hidden.forEach(h => {
+
+        let [row, col, val, type] = h;
+
+        let clues;
+
+        switch(type) {
+
+            case 'row':
+                clues = rowClues(row, col, val);
+                break;
+            case 'col':
+                clues = colClues(row, col, val);
+                break;
+            case 'box':
+                clues = boxClues(row, col, val);
+                break;
+        }
+
+        clues = minArray(permuteArrays(clues));
+
+        h.push(clues);
+
+    });
+
+    console.log(hidden);
+
+    let h = hidden.reduce((prev, next) => prev[4].length > next[4].length ? next : prev);
+
+    console.log(h);
+
+    return h;
+}
 
 const selectDigit = (e) => {
 
-    let digit = parseInt(e.currentTarget.innerText);
+    let digit = Number(e.currentTarget.innerText);
     let cells = document.querySelectorAll('.cell');
+    let numbers = document.querySelector('.numbers');
+
+    // let event = new Event('mousemove');
 
     // disableBar();
+    // numbers.style.animationDuration = '0s';
+    setTimeout(() => numbers.classList.remove('display'), 10);
+    // numbers.style.display = 'none';
 
     for (let cell of cells) {
         if (cell.classList.contains('select')) {
@@ -934,6 +1110,8 @@ const selectDigit = (e) => {
 
             cell.firstChild.innerText = digit;
 
+            // return;
+
             if (cell.dataset.val == digit) {
                 cell.classList.add('filled');
                 board[row][col] = digit;
@@ -942,32 +1120,36 @@ const selectDigit = (e) => {
                 saveBoard();
                 // if (!solved(board)) setTimeout(enableBar, 100);
             } else {
-                cell.classList.add('wrong');
+                cell.classList.add('incorrect');
 
-                cell.style.animation = `error 0.75s 3 ease forwards`;
+                cell.style.animation = 'incorrect 0.75s 3 ease forwards';
 
 
                 cell.addEventListener('animationend', e => {
 
-                    console.log("WRONGEND");
+                    console.log("incorrectEND");
 
                     let cell = e.currentTarget;
 
-                    cell.classList.remove('wrong');
+                    cell.classList.remove('incorrect');
                     cell.firstChild.innerText = '';
                     cell.style.animation = '';
                     cell.style.animationDuration = '';
 
-                    if (!cell.classList.contains('stopbar')) showBar();
+                    if (!cell.classList.contains('stopbar')) showBar({auto: true});
                     cell.classList.remove('stopbar');
                     // enableBar();
 
                 }, {once: true});
 
             }
+            break;
         }
 
-        document.querySelector('.numbers').classList.remove('display');
+        // document.querySelector('.numbers').classList.remove('display');
+
+        // if (cell.classList.contains('filled')) document.dispatchEvent(event);
+
         // disableDigits();
 
     }
@@ -977,22 +1159,31 @@ const selectDigit = (e) => {
         setTimeout(firework, 500)
     };
 
-    e.stopPropagation();
+    // disableDigits();
+
+    // e.stopPropagation();
 
     console.log(digit);
 }
 
 const reset = (e) => {
 
+    let bar = document.querySelector('.bar');
+    let boardEl = document.querySelector('.board');
+
     clearHint();
+    // setTimeout(() => clearHint, 10);
+    // setTimeout(() => bar.classList.remove('showbar', 'showbarinit'), 10);
+
     localStorage.clear();
 
     // e.stopPropagation();
 
     // console.log(document.querySelector('.bar').classList.contains('showbar'));
-    document.querySelector('.bar').style.animationDuration = '0s';
-    document.querySelector('.board').removeEventListener('touchstart', reset);
-    document.querySelector('.board').removeEventListener('mousedown', reset);
+    bar.style.animationDuration = '0s';
+    boardEl.removeEventListener('touchstart', reset);
+    boardEl.removeEventListener('mousedown', reset);
+    boardEl.style.cursor = 'default';
 
     document.querySelectorAll('.cell').forEach(cell => {
         cell.classList.remove('filled');
@@ -1004,12 +1195,25 @@ const reset = (e) => {
         console.log("RELOAD");
 
         initBoard();    
-        fill();
-        save(board); 
-        remove();
-        saveBoard();
+        fillGrid();
+        console.table(board.map(arr => arr.slice()));
+        // saveFilled(board); 
+        removeDigits();
+
+        readFromFile();
+
+        saveFilled(solve()); 
+        if (!aiMode()) saveBoard();
+        console.table(board.map(arr => arr.slice()));
+        solvable(true);
         fillBoard();
         document.querySelector('.bar').style = '';
+        // console.time('1');
+        startTime = Date.now(); //
+        if (aiMode()) {
+            disableTouch();
+            setTimeout(showHint, 500)
+        };
     }, 50);
 
     
@@ -1017,9 +1221,21 @@ const reset = (e) => {
 }
 
 const firework = () => {
-    disableTouch();
 
-    console.log('FIREWORK');
+    // console.timeEnd('1');
+
+    times.push(Number(((Date.now() - startTime) / 1000 / 60).toFixed(1)));
+
+    console.log(times);
+    console.log(times.reduce((a, b) => a + b, 0) / times.length);
+
+    // alert(times.reduce((a, b) => a + b, 0) / times.length); //
+
+    // console.log(((Date.now() - startTime) / 1000 / 60).toFixed(1));
+
+    // disableTouch();
+
+    // console.log('FIREWORK');
 
     let n = 0;
 
@@ -1029,25 +1245,45 @@ const firework = () => {
         cell.removeAttribute('style');
     }
 
+    disableTouch();
+
     let order = Array.from({length: 81}, (_, i) => i);
     order = shuffle(order);
     // console.log(cells);
 
     const pop = () => {
         if (n > 80){
-            document.querySelector('.board').addEventListener('touchstart', reset);
-            document.querySelector('.board').addEventListener('mousedown', reset);
+            // document.querySelector('.board').addEventListener('touchstart', reset);
+            // document.querySelector('.board').addEventListener('mousedown', reset);
+                    
+            // document.querySelector('.board').addEventListener('touchstart', () => showBar());
+            // document.querySelector('.board').addEventListener('mousedown', () => showBar());
+            document.querySelector('.board').style.cursor = 'pointer';
+            enableTouch();     
             clearInterval(interval);
             interval = null;
             // enableBar();
-            setTimeout(showBar, 1000);
-            enableTouch();
+            if (!aiMode()) {
+                document.querySelector('.board').addEventListener('touchstart', () => showBar());
+                document.querySelector('.board').addEventListener('mousedown', () => showBar());
+                document.querySelector('.board').style.cursor = 'pointer';
+                setTimeout(showBar, 1000, {auto: true});
+
+                // enableTouch();              
+            } else {
+                document.querySelector('.board').addEventListener('touchstart', reset);
+                document.querySelector('.board').addEventListener('mousedown',  reset);
+                document.querySelector('.board').style.cursor = 'pointer';
+            }
+
+            if (aiMode()) setTimeout(reset, 1000); //
 
         } else {
             cells[order[n]].firstChild.classList.add('pop');
             cells[order[n]].firstChild.addEventListener('animationend', e => {
                 let cell = e.currentTarget;
                 cell.classList.remove('pop');
+                // cell.parentElement.style.cursor = 'default';
             });
 
             n++;
@@ -1057,129 +1293,32 @@ const firework = () => {
     interval = setInterval(pop, 100);
 }
 
-const eraser = (e) => {
+// const eraser = (e) => {
 
-    let cells = document.querySelectorAll('.cell');
+//     let cells = document.querySelectorAll('.cell');
 
-    for (let cell of cells) {
-        if (cell.classList.contains('gray')) {
+//     for (let cell of cells) {
+//         if (cell.classList.contains('gray')) {
 
-            let [row, col] = cellCoords(cell);
+//             let [row, col] = cellCoords(cell);
 
-            cell.classList.remove('gray','red');
-            cell.firstChild.innerText = '';
-            board[row][col] = 0;
-        }
-
-        document.querySelector('.eraser').classList.remove('display');
-
-        // disableDigits();
-        // disableEraser();
-    }
-}
-
-const enableDigits = () => {
-
-    let digits = document.querySelectorAll('.number');
-
-    for (let digit of digits){
-        if (touchScreen()){
-            digit.addEventListener("touchstart", selectDigit);
-        } else {
-            digit.addEventListener("mousedown", selectDigit);
-        }
-    }
-}
-
-// const disableDigits = () => {
-
-//     let digits = document.querySelectorAll('.number');
-
-//     for (let digit of digits){
-//         if (touchScreen()){
-//             digit.removeEventListener("touchstart", selectDigit);
-//         } else {
-//             digit.removeEventListener("mousedown", selectDigit);
+//             cell.classList.remove('gray','red');
+//             cell.firstChild.innerText = '';
+//             board[row][col] = 0;
 //         }
+
+//         document.querySelector('.eraser').classList.remove('display');
+
+//         // disableDigits();
+//         // disableEraser();
 //     }
 // }
 
-const reloadBtn = () => {
-
-    console.log("RELOAD");
-}
-
-const enableBar = () => {
-
-    let reload = document.querySelector('.reload');
-    let hint = document.querySelector('.hint');
-
-    if (touchScreen()){
-        document.body.addEventListener('touchstart', hintArea);
-        hint.addEventListener("touchstart", showHint);
-        reload.addEventListener("touchstart", reset);
-    } else {
-        document.body.addEventListener('mousedown', hintArea);
-        hint.addEventListener("mousedown", showHint);
-        reload.addEventListener("mousedown", reset);
-    }
-
-    console.log("ENABLE BAR");
-}
-
-const disableBar = () => {
-
-    let reload = document.querySelector('.reload');
-    let hint = document.querySelector('.hint');
-
-    if (touchScreen()){
-        document.body.removeEventListener('touchstart', hintArea);
-        hint.removeEventListener("touchstart", showHint);
-        reload.removeEventListener("touchstart", reset);
-    } else {
-        document.body.removeEventListener('mousedown', hintArea);
-        hint.removeEventListener("mousedown", showHint);
-        reload.removeEventListener("mousedown", reset);
-    }
-}
-
-// const enableEraser = () => {
-
-//     let x = document.querySelector('.x');
-
-//         if (touchScreen()){
-//             x.addEventListener("touchstart", showHint);
-//         } else {
-//             x.addEventListener("mousedown", showHint);
-//         }
-// }
-
-// const disableEraser = () => {
-
-//     let x = document.querySelector('.x');
-
-//         if (touchScreen()){
-//             x.removeEventListener("touchstart", eraser);
-//         } else {
-//             x.removeEventListener("mousedown", eraser);
-//         }
-// }
-
-const disableTapZoom = () => {
-
-    const preventDefault = (e) => e.preventDefault();
-
-    document.body.addEventListener('touchstart', preventDefault, {passive: false});
-    document.body.addEventListener('mousedown', preventDefault, {passive: false});
-}
-
-// const 
-
-const hintArea = (e) => {
+const barArea = (e) => {
 
     // console.log('----')
 
-    let h1 = document.querySelector('h1');
+    // let h1 = document.querySelector('h1');
     let board = document.querySelector('.board');
     let cell = document.querySelector('.cell');
 
@@ -1214,15 +1353,156 @@ const hintArea = (e) => {
     if (x > left && x < right && y < bottom && y > top) showBar();
 }
 
+// const mouseMove = (e) => {
+
+//     console.log('mousemove');
+
+//     let h1 = document.querySelector('h1');
+//     let board = document.querySelector('.board');
+//     let cell = document.querySelector('.cell');
+
+//     let top = board.offsetTop - cell.offsetHeight * 2;
+//     let bottom = board.offsetTop;
+//     let left = board.offsetLeft;
+//     let right = board.offsetLeft + board.offsetWidth;
+
+//     let curX = e.clientX;
+//     let curY = e.clientY;
+
+//     if (curX) {
+//         [x, y] = [curX, curY];
+//     } else {
+//         [curX, curY] = [x, y];
+//     }
+
+//     console.log(e);
+
+//     if (curX > left && curX < right && curY < bottom && curY > top) {
+//         console.log('inside');
+//         if (!document.querySelector('.numbers').classList.contains('display') &&
+//             !document.querySelector('.bar').classList.contains('showbar') &&
+//             !document.querySelector('.bar').classList.contains('showbarinit')) {
+//                 document.body.style.cursor = 'pointer';
+//                 return;
+//         }
+//     }
+//     // } else {
+//         document.body.style.cursor = 'default';
+//     // }
+
+
+// }
+
+const enableDigits = () => {
+
+    let digits = document.querySelectorAll('.number');
+
+    for (let digit of digits){
+        if (touchScreen()){
+            digit.addEventListener("touchstart", selectDigit);
+        } else {
+            digit.addEventListener("mousedown", selectDigit);
+        }
+    }
+}
+
+// const disableDigits = () => {
+
+//     let digits = document.querySelectorAll('.number');
+
+//     for (let digit of digits){
+//         if (touchScreen()){
+//             digit.removeEventListener("touchstart", selectDigit);
+//         } else {
+//             digit.removeEventListener("mousedown", selectDigit);
+//         }
+//     }
+// }
+
+// const reloadBtn = () => {
+
+//     console.log("RELOAD");
+// }
+
+const enableBar = () => {
+
+    let reload = document.querySelector('.reload');
+    let hint = document.querySelector('.hint');
+
+    if (touchScreen()){
+        document.body.addEventListener('touchstart', barArea);
+        hint.addEventListener("touchstart", showHint);
+        reload.addEventListener("touchstart", reset);
+    } else {
+        document.body.addEventListener('mousedown', barArea);
+        hint.addEventListener("mousedown", showHint);
+        reload.addEventListener("mousedown", reset);
+    }
+
+    // document.addEventListener('mousemove', mouseMove);
+
+    console.log("ENABLE BAR");
+}
+
+// const disableBar = () => {
+
+//     let reload = document.querySelector('.reload');
+//     let hint = document.querySelector('.hint');
+
+//     if (touchScreen()){
+//         document.body.removeEventListener('touchstart', hintArea);
+//         hint.removeEventListener("touchstart", showHint);
+//         reload.removeEventListener("touchstart", reset);
+//     } else {
+//         document.body.removeEventListener('mousedown', hintArea);
+//         hint.removeEventListener("mousedown", showHint);
+//         reload.removeEventListener("mousedown", reset);
+//     }
+// }
+
+// const enableEraser = () => {
+
+//     let x = document.querySelector('.x');
+
+//         if (touchScreen()){
+//             x.addEventListener("touchstart", showHint);
+//         } else {
+//             x.addEventListener("mousedown", showHint);
+//         }
+// }
+
+// const disableEraser = () => {
+
+//     let x = document.querySelector('.x');
+
+//         if (touchScreen()){
+//             x.removeEventListener("touchstart", eraser);
+//         } else {
+//             x.removeEventListener("mousedown", eraser);
+//         }
+// }
+
+const disableTapZoom = () => {
+
+    const preventDefault = (e) => e.preventDefault();
+
+    document.body.addEventListener('touchstart', preventDefault, {passive: false});
+    document.body.addEventListener('mousedown', preventDefault, {passive: false});
+}
+
+// const 
+
 const enableTouch = () => {
 
     let cells = document.querySelectorAll('.cell');
 
     for (let cell of cells){
         if (touchScreen()){
-            cell.addEventListener("touchstart", select);
+            cell.addEventListener("touchstart", selectCell);
         } else {
-            cell.addEventListener("mousedown", select);
+            cell.addEventListener("mousedown", selectCell);
+            cell.style.cursor = 'pointer';
+
         }
     }
 }
@@ -1233,30 +1513,129 @@ const disableTouch = () => {
 
     for (let cell of cells){
         if (touchScreen()){
-            cell.removeEventListener("touchstart", select);
+            cell.removeEventListener("touchstart", selectCell);
         } else {
-            cell.removeEventListener("mousedown", select);
+            cell.removeEventListener("mousedown", selectCell);
+            cell.style.cursor = 'default';
         }
     }
 }
 
-const initBar = () => {
+// const initBar = () => {
 
-    document.querySelector('body').addEventListener('transitionend', e => {
+//     document.querySelector('body').addEventListener('transitionend', e => {
         
-        console.log("HELLO");
-    });
+//         // console.log("HELLO");
+//     });
 
+// }
+
+const enableKeys = () => document.addEventListener('keydown', e => {
+
+    let digits = [1,2,3,4,5,6,7,8,9];
+    let event = new Event('mousedown');
+    let numbers = document.querySelectorAll('.number');
+
+    console.log("KEY");
+
+    let codes = ['Escape', 'Space', 'Enter'];
+
+    if (codes.includes(e.code)) {
+
+    //     if (aiMode() && (!solved(board) || interval)) return;
+    //     if (solved(board) && interval) return;
+    //     if (document.querySelector('.numbers').classList.contains('display')) return;
+
+    //     if (document.querySelector('.bar').classList.contains('showbar') || 
+    //         document.querySelector('.bar').classList.contains('showbarinit')) return;
+
+        if (document.querySelector('.numbers').classList.contains('display')) return;
+
+        if (aiMode() && solved(board) && !interval) {
+            reset();
+            return;}
+
+        if (!aiMode()) showBar();
+    
+    }
+
+    if (!document.querySelector('.numbers').classList.contains('display')) return;
+    if (!digits.includes(Number(e.key))) return;
+
+    numbers[Number(e.key) - 1].dispatchEvent(event);
+});
+
+const aiMode = () => {
+
+    let queryString = window.location.search;
+    let urlParams = new URLSearchParams(queryString);
+    let mode = urlParams.get('mode');
+    
+    return mode == 'ai';
+
+    // return true; //
 }
 
-const aiPlay = () => {
-    return true;
+const readFromFile = () => {
+
+    // let zero = '0';
+    let abc ='abcdefghijklmnopqrstuvwxyz';
+    // let board = [];
+
+    let n = Math.trunc(Math.random() * sudokus.length);
+
+    console.log(n);
+
+    let sudoku = sudokus[n];
+    // let sudoku = sudokus[n++];
+
+    // let sudoku = sudokus[1525];
+
+    console.log(sudoku);
+
+    for (let i = 0; i < abc.length; i++) {
+        
+        let zeroes = '0'.repeat(i + 1); 
+        let regex = new RegExp(abc[i], 'g');
+
+        sudoku = sudoku.replace(regex, zeroes);   
+    }
+ 
+    console.log(sudoku);
+
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            board[i][j] = Number(sudoku[i * 9 + j]);
+        }
+    }
+
+    // for (let i = 0; i < 9; i++) {
+    //     [board[i][4], board[i][5]] = [board[i][5], board[i][4]];
+    // }
+
+    console.table(board);
 }
 
 const init = () => {
 
     // window.addEventListener('visibilitychange', () => {
-    //     if (document.hidden) win() ? reset() : clearHint();
+    //     console.log("VISIBILITY CHANGE")
+    // }, false);
+
+    // window.addEventListener('pagehide', () => {
+    //     console.log("PAGE HIDE")
+    // }, false);
+
+    // window.addEventListener('focus', () => {
+    //     console.log("FOCUS")
+    // }, false);
+
+    // window.addEventListener('blur', () => {
+    //     console.log("BLUR")
+    // }, false);
+
+    // window.addEventListener('pageshow', () => {
+    //     console.log("PAGE SHOW")
     // }, false);
 
     disableTapZoom();
@@ -1265,25 +1644,34 @@ const init = () => {
 
     initBoard();
     
+    solvable(true);
+
     let t0 = performance.now();
 
-    fill();
+    fillGrid();
 
-    // saveBoard();
+    console.table(board.map(arr => arr.slice()));
 
-    save(board); 
+
+    // saveFilled(board); 
 
     let t1 = performance.now();
 
-    remove();
+    removeDigits();
 
     let t2 = performance.now();
 
-    // console.log(board.map(arr => arr.slice()));
+    readFromFile();
 
-    // console.log(checkStorage());
+    // board = solve(); //
+    // board[7][7] = 0; //
 
-    checkStorage();
+    saveFilled(solve()); 
+
+
+    if (!aiMode()) checkStorage();
+
+    console.table(board.map(arr => arr.slice()));
 
     saveBoard();
 
@@ -1301,24 +1689,44 @@ const init = () => {
 
         showBoard();
 
-        initBar();
+        // initBar();
 
-        setTimeout(showBar, 1000, true);
+        enableKeys();
+
+        if (aiMode()) {
+            disableTouch();
+            setTimeout(showHint, 2000);
+            // console.time('1');
+            startTime = Date.now();
+
+        } else {
+
+            setTimeout(showBar, 1000, {auto: true});
+            enableTouch();
+            // enableKeys();
+            enableDigits();
+            enableBar();
+        }
+
+        // setTimeout(screenshot5, 2000);
+
+        // setTimeout(showBar, 1000, true);
 
 
-        enableTouch();
-        enableDigits();
-        // enableEraser();
-        enableBar();
+        // enableTouch();
+        // enableDigits();
+        // enableBar();
 
-        solvable(true, true);
+        console.table(solve().map(arr => arr.slice()));
+
+        solvable(true);
 
 
         console.table(board);
 
         console.log(t1 - t0);
         console.log(t2 - t1);
-        console.log(count(board));
+        // console.log(countFilled(board));
     // }, 500);
 }
 
