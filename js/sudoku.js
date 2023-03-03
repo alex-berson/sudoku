@@ -560,10 +560,10 @@ const selectCell = (e) => {
         }
 
         numbers.classList.remove('display');
-        bar.classList.remove('showbarinit', 'showbar');
-        bar.style.display = 'none';
-        numbers.style.display = 'flex';
-        bar.style.animationDuration = '';
+        // bar.classList.remove('showbarinit', 'showbar');
+        // bar.style.display = 'none';
+        // numbers.style.display = 'flex';
+        // bar.style.animationDuration = '';
 
         // disableDigits();
         // disableEraser();
@@ -573,7 +573,7 @@ const selectCell = (e) => {
     if (cell.classList.contains('select')) {
         cell.classList.remove('select');
         numbers.classList.remove('display');
-        bar.classList.remove('showbarinit', 'showbar');
+        // bar.classList.remove('showbarinit', 'showbar');
         // disableDigits();
         // disableEraser();
 
@@ -587,7 +587,7 @@ const selectCell = (e) => {
     cell.classList.add('select');
 
     document.querySelector('.numbers').classList.remove('display');
-    document.querySelector('.bar').classList.remove('showbar', 'showbarinit');
+    // document.querySelector('.bar').classList.remove('showbar', 'showbarinit');
 
     // if (cell.classList.contains('red')) {
 
@@ -602,62 +602,62 @@ const selectCell = (e) => {
     //     return;  
     // }
 
-    bar.style.display = 'none';
-    numbers.style.display = 'flex';
+    // bar.style.display = 'none';
+    // numbers.style.display = 'flex';
 
     setTimeout(() => document.querySelector('.numbers').classList.add('display'), 0);
 }
 
-const showBar = ({auto = false} = {}) => {
+// const showBar = ({auto = false} = {}) => {
 
-    console.log("SHOWBAR", auto);
+//     console.log("SHOWBAR", auto);
 
-    // let event = new Event('mousemove');
-    let numbers = document.querySelector('.numbers');
-    // let button = document.querySelector('.hint');
-    let bar = document.querySelector('.bar');
+//     // let event = new Event('mousemove');
+//     let numbers = document.querySelector('.numbers');
+//     // let button = document.querySelector('.hint');
+//     let bar = document.querySelector('.bar');
 
-    if (aiMode()) bar.style.animationDuration = '';
+//     if (aiMode()) bar.style.animationDuration = '';
     
-    if (numbers.classList.contains('display') || bar.classList.contains('showbar') || bar.classList.contains('showbarinit')) return;
+//     if (numbers.classList.contains('display') || bar.classList.contains('showbar') || bar.classList.contains('showbarinit')) return;
 
-    // if (numbers.classList.contains('display')) return;
+//     // if (numbers.classList.contains('display')) return;
 
 
-    console.log("SHOWBAR2");
+//     console.log("SHOWBAR2");
 
-    // console.log(getComputedStyle(bar).getPropertyValue(display));
+//     // console.log(getComputedStyle(bar).getPropertyValue(display));
     
-    numbers.style.display = 'none';
-    // button.style.display = 'grid';
-    bar.style.display = 'flex';
+//     numbers.style.display = 'none';
+//     // button.style.display = 'grid';
+//     bar.style.display = 'flex';
 
-    bar.style.visibility = 'visible';
+//     bar.style.visibility = 'visible';
 
-    auto ? bar.classList.add('showbarinit') : bar.classList.add('showbar');
+//     auto ? bar.classList.add('showbarinit') : bar.classList.add('showbar');
 
-    // if (bar.classList.contains ('showbar')) console.log("CONTAINS");
+//     // if (bar.classList.contains ('showbar')) console.log("CONTAINS");
 
-    // document.dispatchEvent(event);
+//     // document.dispatchEvent(event);
 
-    bar.addEventListener('animationend', e => {
+//     bar.addEventListener('animationend', e => {
 
-        let bar = e.currentTarget;
-        // let event = new Event('mousemove');
+//         let bar = e.currentTarget;
+//         // let event = new Event('mousemove');
 
-        numbers.style.display = 'flex';
-        bar.style.display = 'none';
+//         numbers.style.display = 'flex';
+//         bar.style.display = 'none';
 
-        // button.style.display = 'none';
-        // numbers.style.display = 'flex';
+//         // button.style.display = 'none';
+//         // numbers.style.display = 'flex';
 
-        // button.style.visibility = 'hidden';
-        bar.classList.remove('showbar', 'showbarinit');
-        bar.style.animationDuration = '';
-        // document.dispatchEvent(event);
+//         // button.style.visibility = 'hidden';
+//         bar.classList.remove('showbar', 'showbarinit');
+//         bar.style.animationDuration = '';
+//         // document.dispatchEvent(event);
 
-    }, {once: true});
-}
+//     }, {once: true});
+// }
 
 const clearHint = () => {
 
@@ -666,11 +666,23 @@ const clearHint = () => {
     clearInterval(interval);
 
     let cells = document.querySelectorAll('.cell');
+
+    document.querySelector('.numbers').classList.remove('display');
+
+    // document.querySelector('.hint').src = 'images/lightbulb.svg';
+
+    if (!aiMode()) document.querySelector('.hint').classList.remove('on');
+
+    // {
+        // document.querySelector('.hint').classList.remove('on');
+        // document.querySelector('.hint').classList.add('off');
+    // }
+
     // let event = new Event('transitionend');
 
-    let bar = document.querySelector('.bar');
+    // let bar = document.querySelector('.bar');
 
-    setTimeout(() => bar.classList.remove('showbar', 'showbarinit'), 10);
+    // setTimeout(() => bar.classList.remove('showbar', 'showbarinit'), 10);
 
     // bar.classList.remove('showbar', 'showbarinit');
 
@@ -684,7 +696,7 @@ const clearHint = () => {
             // cell.dispatchEvent(event);
         }
 
-        if (cell.classList.contains('incorrect')) cell.classList.add('stopbar');
+        // if (cell.classList.contains('incorrect')) cell.classList.add('stopbar');
 
         // cell.style.transition = `background-color 0s ease-in-out, font-weight 0s ease-in-out`;
         // cell.style = '';
@@ -698,35 +710,66 @@ const clearHint = () => {
 
 const showHint = (e) => {
 
-    let bar = document.querySelector('.bar');
+    // let bar = document.querySelector('.bar');
 
     // document.querySelector('.bar').classList.remove('showbar', 'showbarinit');
 
-    // console.log("SHOWHINT");
+    console.log("SHOWHINT");
 
     // document.querySelector('.bar').classList.remove('showbar', 'showbarinit');
-
 
     if (solved(board)) {
         // console.log(interval);
-        if (!interval) firework();
+        // if (!interval) firework();
         // if (!aiMode()) e.stopPropagation();
 
         // let bar = document.querySelector('.bar');
-        bar.style.animationDuration = '0.0s';
+        // bar.style.animationDuration = '0.0s';
+
+        aiMode() ? firework() : enableHints();
 
         return;
     }
 
-    clearHint();
     // setTimeout(() => bar.classList.remove('showbar', 'showbarinit'), 10);
+
+    // disableHints();
+
+    clearHint();
+
+    // const resetHintBtn = (e) => {
+       
+    //     let hintEl = e.currentTarget;
+
+    //     hintEl.style.opacity = 1;
+    // }
+
+    // document.querySelector('.hint').src = 'images/lightbulb2.svg';
+
+    if (!aiMode()) document.querySelector('.hint').classList.add('on');
+    // {
+        // document.querySelector('.hint').classList.remove('off');
+        // document.querySelector('.hint').classList.add('on');
+    // }
+
+    // hintEl.style.opacity = 0.5;
+
+    // hintEl.src = 'images/lightbulb2.svg';
+
+
+    // hintEl.addEventListener("touchend", resetHintBtn);
+    // hintEl.addEventListener("touchcancel", resetHintBtn);
+    // hintEl.addEventListener("mouseup", resetHintBtn);
+    // hintEl.addEventListener("mouseleave", resetHintBtn);
 
     let cells = document.querySelectorAll('.cell');
     let [row, col, val, type, clues] = hint();
     let cell = cells[row * 9 + col];
     let delay = 0;
 
-    bar.style.animationDuration = '0s';
+    // cells.forEach(cell => cell.classList.remove('select'));
+
+    // bar.style.animationDuration = '0s';
 
     let boxRow = Math.trunc(row / 3) * 3;
     let boxCol = Math.trunc(col / 3) * 3;
@@ -920,6 +963,19 @@ const showHint = (e) => {
         cell.style.animation = '';
         cell.style.animationDuration = '';
 
+        // setTimeout(() => document.querySelector('.hint').src = 'images/lightbulb.svg', 200);
+
+        // setTimeout(() => {
+
+        if (!aiMode()) document.querySelector('.hint').classList.remove('on');
+
+        // {
+            // document.querySelector('.hint').classList.remove('on');
+            // document.querySelector('.hint').classList.add('off');
+        // }
+    
+        // }, 200);
+        
 
         document.querySelectorAll('.gray, .bold').forEach(el => {
             el.style.transition = `background-color 0.2s ease-in-out, font-weight 0.2s ease-in-out`;
@@ -931,6 +987,7 @@ const showHint = (e) => {
             cell.classList.add('filled');
             board[row][col] = val;
             solved(board) ? showHint() : setTimeout(showHint, 500);
+            return;
         }
 
 
@@ -947,6 +1004,8 @@ const showHint = (e) => {
         // console.log("SHOWHINT");
 
         // enableBar();
+
+        enableHints();
 
 
     }, {once: true});
@@ -1051,7 +1110,6 @@ const hint = () => {
     checkCols(board, true);
     // checkCells(board, true);
 
-
     // console.log(singles);
 
     hidden.forEach(h => {
@@ -1136,8 +1194,8 @@ const selectDigit = (e) => {
                     cell.style.animation = '';
                     cell.style.animationDuration = '';
 
-                    if (!cell.classList.contains('stopbar')) showBar({auto: true});
-                    cell.classList.remove('stopbar');
+                    // if (!cell.classList.contains('stopbar')) showBar({auto: true});
+                    // cell.classList.remove('stopbar');
                     // enableBar();
 
                 }, {once: true});
@@ -1168,7 +1226,7 @@ const selectDigit = (e) => {
 
 const reset = (e) => {
 
-    let bar = document.querySelector('.bar');
+    // let bar = document.querySelector('.bar');
     let boardEl = document.querySelector('.board');
 
     clearHint();
@@ -1180,7 +1238,7 @@ const reset = (e) => {
     // e.stopPropagation();
 
     // console.log(document.querySelector('.bar').classList.contains('showbar'));
-    bar.style.animationDuration = '0s';
+    // bar.style.animationDuration = '0s';
     boardEl.removeEventListener('touchstart', reset);
     boardEl.removeEventListener('mousedown', reset);
     boardEl.style.cursor = 'default';
@@ -1188,6 +1246,7 @@ const reset = (e) => {
     document.querySelectorAll('.cell').forEach(cell => {
         cell.classList.remove('filled');
         cell.firstChild.classList.remove('pop');
+        cell => cell.style.cursor = 'default'
     });
 
     setTimeout(() => {
@@ -1207,13 +1266,17 @@ const reset = (e) => {
         console.table(board.map(arr => arr.slice()));
         solvable(true);
         fillBoard();
-        document.querySelector('.bar').style = '';
+
+        // document.querySelector('.bar').style = '';
         // console.time('1');
         startTime = Date.now(); //
         if (aiMode()) {
             disableTouch();
             setTimeout(showHint, 500)
-        };
+        } else {
+            // enableHints();
+            enableTouch();
+        }   
     }, 50);
 
     
@@ -1245,6 +1308,7 @@ const firework = () => {
         cell.removeAttribute('style');
     }
 
+    // disableHints();
     disableTouch();
 
     let order = Array.from({length: 81}, (_, i) => i);
@@ -1258,25 +1322,27 @@ const firework = () => {
                     
             // document.querySelector('.board').addEventListener('touchstart', () => showBar());
             // document.querySelector('.board').addEventListener('mousedown', () => showBar());
-            document.querySelector('.board').style.cursor = 'pointer';
-            enableTouch();     
+            // document.querySelector('.board').style.cursor = 'pointer';
+            // enableTouch();     
             clearInterval(interval);
             interval = null;
             // enableBar();
-            if (!aiMode()) {
-                document.querySelector('.board').addEventListener('touchstart', () => showBar());
-                document.querySelector('.board').addEventListener('mousedown', () => showBar());
-                document.querySelector('.board').style.cursor = 'pointer';
-                setTimeout(showBar, 1000, {auto: true});
+            // if (!aiMode()) {
+            //     document.querySelector('.board').addEventListener('touchstart', () => showBar());
+            //     document.querySelector('.board').addEventListener('mousedown', () => showBar());
+            //     document.querySelector('.board').style.cursor = 'pointer';
+            //     setTimeout(showBar, 1000, {auto: true});
 
-                // enableTouch();              
-            } else {
+            //     // enableTouch();              
+            // } else {
                 document.querySelector('.board').addEventListener('touchstart', reset);
                 document.querySelector('.board').addEventListener('mousedown',  reset);
                 document.querySelector('.board').style.cursor = 'pointer';
-            }
+                document.querySelectorAll('.cell').forEach(cell => cell.style.cursor = 'pointer');
 
-            if (aiMode()) setTimeout(reset, 1000); //
+            // }
+
+            // if (aiMode()) setTimeout(reset, 1000); //
 
         } else {
             cells[order[n]].firstChild.classList.add('pop');
@@ -1293,106 +1359,6 @@ const firework = () => {
     interval = setInterval(pop, 100);
 }
 
-// const eraser = (e) => {
-
-//     let cells = document.querySelectorAll('.cell');
-
-//     for (let cell of cells) {
-//         if (cell.classList.contains('gray')) {
-
-//             let [row, col] = cellCoords(cell);
-
-//             cell.classList.remove('gray','red');
-//             cell.firstChild.innerText = '';
-//             board[row][col] = 0;
-//         }
-
-//         document.querySelector('.eraser').classList.remove('display');
-
-//         // disableDigits();
-//         // disableEraser();
-//     }
-// }
-
-const barArea = (e) => {
-
-    // console.log('----')
-
-    // let h1 = document.querySelector('h1');
-    let board = document.querySelector('.board');
-    let cell = document.querySelector('.cell');
-
-    let top = board.offsetTop - cell.offsetHeight * 2;
-    let bottom = board.offsetTop;
-    let left = board.offsetLeft;
-    let right = board.offsetLeft + board.offsetWidth;
-    let x, y;
-
-    if (touchScreen()) {
-        // console.log(e.touches[0].clientX);
-        // console.log(e.touches[0].clientY);
-
-        x = e.touches[e.touches.length - 1].clientX;
-        y = e.touches[e.touches.length - 1].clientY;
-
-    } else {
-        // console.log(e.clientX);
-        // console.log(e.clientY);
-
-        x = e.clientX;
-        y = e.clientY;
-
-    }
-
-    // console.log(h1.offsetTop + h1.offsetHeight * 0.87);
-
-    // console.log(board.offsetTop - cell.offsetHeight * 2);
-
-    // console.log(board.offsetTop);
-
-    if (x > left && x < right && y < bottom && y > top) showBar();
-}
-
-// const mouseMove = (e) => {
-
-//     console.log('mousemove');
-
-//     let h1 = document.querySelector('h1');
-//     let board = document.querySelector('.board');
-//     let cell = document.querySelector('.cell');
-
-//     let top = board.offsetTop - cell.offsetHeight * 2;
-//     let bottom = board.offsetTop;
-//     let left = board.offsetLeft;
-//     let right = board.offsetLeft + board.offsetWidth;
-
-//     let curX = e.clientX;
-//     let curY = e.clientY;
-
-//     if (curX) {
-//         [x, y] = [curX, curY];
-//     } else {
-//         [curX, curY] = [x, y];
-//     }
-
-//     console.log(e);
-
-//     if (curX > left && curX < right && curY < bottom && curY > top) {
-//         console.log('inside');
-//         if (!document.querySelector('.numbers').classList.contains('display') &&
-//             !document.querySelector('.bar').classList.contains('showbar') &&
-//             !document.querySelector('.bar').classList.contains('showbarinit')) {
-//                 document.body.style.cursor = 'pointer';
-//                 return;
-//         }
-//     }
-//     // } else {
-//         document.body.style.cursor = 'default';
-//     // }
-
-
-// }
-
 const enableDigits = () => {
 
     let digits = document.querySelectorAll('.number');
@@ -1406,82 +1372,6 @@ const enableDigits = () => {
     }
 }
 
-// const disableDigits = () => {
-
-//     let digits = document.querySelectorAll('.number');
-
-//     for (let digit of digits){
-//         if (touchScreen()){
-//             digit.removeEventListener("touchstart", selectDigit);
-//         } else {
-//             digit.removeEventListener("mousedown", selectDigit);
-//         }
-//     }
-// }
-
-// const reloadBtn = () => {
-
-//     console.log("RELOAD");
-// }
-
-const enableBar = () => {
-
-    let reload = document.querySelector('.reload');
-    let hint = document.querySelector('.hint');
-
-    if (touchScreen()){
-        document.body.addEventListener('touchstart', barArea);
-        hint.addEventListener("touchstart", showHint);
-        reload.addEventListener("touchstart", reset);
-    } else {
-        document.body.addEventListener('mousedown', barArea);
-        hint.addEventListener("mousedown", showHint);
-        reload.addEventListener("mousedown", reset);
-    }
-
-    // document.addEventListener('mousemove', mouseMove);
-
-    console.log("ENABLE BAR");
-}
-
-// const disableBar = () => {
-
-//     let reload = document.querySelector('.reload');
-//     let hint = document.querySelector('.hint');
-
-//     if (touchScreen()){
-//         document.body.removeEventListener('touchstart', hintArea);
-//         hint.removeEventListener("touchstart", showHint);
-//         reload.removeEventListener("touchstart", reset);
-//     } else {
-//         document.body.removeEventListener('mousedown', hintArea);
-//         hint.removeEventListener("mousedown", showHint);
-//         reload.removeEventListener("mousedown", reset);
-//     }
-// }
-
-// const enableEraser = () => {
-
-//     let x = document.querySelector('.x');
-
-//         if (touchScreen()){
-//             x.addEventListener("touchstart", showHint);
-//         } else {
-//             x.addEventListener("mousedown", showHint);
-//         }
-// }
-
-// const disableEraser = () => {
-
-//     let x = document.querySelector('.x');
-
-//         if (touchScreen()){
-//             x.removeEventListener("touchstart", eraser);
-//         } else {
-//             x.removeEventListener("mousedown", eraser);
-//         }
-// }
-
 const disableTapZoom = () => {
 
     const preventDefault = (e) => e.preventDefault();
@@ -1490,7 +1380,60 @@ const disableTapZoom = () => {
     document.body.addEventListener('mousedown', preventDefault, {passive: false});
 }
 
-// const 
+
+const enableHints = () => {
+
+    let hint = document.querySelector('.hint');
+
+    // const resetHintBtn = (e) => {
+       
+    //     let hint = e.currentTarget;
+
+    //     hint.style.opacity = 1;
+    // }
+
+    if (touchScreen()){
+        // hint.addEventListener("touchstart", showHint);
+
+        hint.addEventListener("touchstart", () => {
+
+            document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('select'));
+    
+            setTimeout(() => showHint(), 0);
+        }, {once: true});
+
+        // hint.addEventListener("touchend", resetHintBtn);
+        // hint.addEventListener("touchcancel", resetHintBtn);
+    } else {
+        // hint.addEventListener("mousedown", showHint);
+
+        hint.addEventListener("mousedown", () => {
+
+            document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('select'));
+    
+            setTimeout(() => showHint(), 0);
+
+        }, {once: true});
+
+
+
+        // hint.addEventListener("mouseup", resetHintBtn);
+    // hint.addEventListener("mouseleave", resetHintBtn);
+        hint.style.cursor = 'pointer';
+    }
+}
+
+// const disableHints = () => {
+
+//     let hint = document.querySelector('.hint');
+
+//     if (touchScreen()){
+//         hint.removeEventListener("touchstart", showHint);
+//     } else {
+//         hint.removeEventListener("mousedown", showHint);
+//         // hint.style.cursor = 'default';
+//     }
+// }
 
 const enableTouch = () => {
 
@@ -1521,14 +1464,6 @@ const disableTouch = () => {
     }
 }
 
-// const initBar = () => {
-
-//     document.querySelector('body').addEventListener('transitionend', e => {
-        
-//         // console.log("HELLO");
-//     });
-
-// }
 
 const enableKeys = () => document.addEventListener('keydown', e => {
 
@@ -1694,18 +1629,23 @@ const init = () => {
         enableKeys();
 
         if (aiMode()) {
-            disableTouch();
+            // disableTouch();
+            // document.querySelector('.hint').classList.remove('off');
+            document.querySelector('.hint').classList.add('on');
+        
             setTimeout(showHint, 2000);
             // console.time('1');
             startTime = Date.now();
 
         } else {
 
-            setTimeout(showBar, 1000, {auto: true});
+            // setTimeout(showBar, 1000, {auto: true});
             enableTouch();
             // enableKeys();
             enableDigits();
-            enableBar();
+            // enableBar();
+
+            enableHints();
         }
 
         // setTimeout(screenshot5, 2000);
