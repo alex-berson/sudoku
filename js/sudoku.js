@@ -2,6 +2,7 @@ let board;
 let nClues = 28;
 let interval;
 let hidden = [];
+let timer;
 
 let startTime; //
 let times = []; //
@@ -132,7 +133,18 @@ const saveBoard = () => {
     //     localStorage.setItem('solved', JSON.stringify(solved))
     // }
     
-    localStorage.setItem('board', JSON.stringify(board))
+    let item = {
+
+        board,
+        // expiry: Date.now() + 604800000
+        expiry: Date.now() + 60000
+
+    }
+
+    // localStorage.setItem('board', JSON.stringify(board));
+
+    localStorage.setItem('board', JSON.stringify(item));
+
 };
 
 // const loadBoard = () => board = JSON.parse(localStorage.getItem('board'));
@@ -150,13 +162,17 @@ const checkStorage = () => {
 
      if (localStorage.getItem('board') != null) {
 
-        board = JSON.parse(localStorage.getItem('board'));
+        let boardStr = JSON.parse(localStorage.getItem('board'));
+
+        if (Date.now() > boardStr.expiry) return;
+
+        board = boardStr.board;
 
         let solved = solve();
 
         saveFilled(solved);
     }
-};
+}
 
 const cellCoords = (touchedCell) => {
 
@@ -665,13 +681,31 @@ const clearHint = () => {
 
     clearInterval(interval);
 
+    clearTimeout(timer);
+
     let cells = document.querySelectorAll('.cell');
 
     document.querySelector('.numbers').classList.remove('display');
 
     // document.querySelector('.hint').src = 'images/lightbulb.svg';
 
-    if (!aiMode()) document.querySelector('.hint').classList.remove('on');
+    if (!aiMode()) {
+
+        let hint = document.querySelector('.hint');
+
+        hint.style.transition = '0.1s ease-in-out';
+        
+        hint.classList.remove('on');
+
+        hint.addEventListener('transitionend', (e) => {
+
+            let hint = e.currentTarget;
+
+            hint.removeAttribute('style');
+       
+        }, {once: true}); 
+    
+    }
 
     // {
         // document.querySelector('.hint').classList.remove('on');
@@ -934,7 +968,10 @@ const showHint = (e) => {
 
     cell.firstChild.innerText = val;
 
-    let repeats = aiMode() ? 4.37 : 5;
+    // let repeats = aiMode() ? 4.37 : 5;
+
+    let repeats = aiMode() ? 4.37 : 4.5;
+
 
     // repeats = 3;
 
@@ -942,6 +979,9 @@ const showHint = (e) => {
     // cell.style.animation = 'hint 1s 5 ease forwards';
 
     cell.style.animation = `correct 0.75s ${repeats} ease forwards`;
+
+    cell.style.transition = `all 1s linear`;
+
 
     cell.style.animationDelay = `${delay}s`;
 
@@ -1178,10 +1218,16 @@ const selectDigit = (e) => {
                 saveBoard();
                 // if (!solved(board)) setTimeout(enableBar, 100);
             } else {
+                // cell.firstElementChild.style.visibility = 'hidden';
+                // cell.firstElementChild.style.opacity = 0;
+                // cell.firstElementChild.style.color = 'firebrick';
+                // cell.firstElementChild.style.animation = 'incorrect 1s 0.1s step-start 3';
+
+
+
                 cell.classList.add('incorrect');
 
                 cell.style.animation = 'incorrect 0.75s 3 ease forwards';
-
 
                 cell.addEventListener('animationend', e => {
 
@@ -1646,9 +1692,14 @@ const init = () => {
             // enableBar();
 
             enableHints();
+
+            timer = setTimeout(() => document.querySelector('.hint').classList.remove('on'), 1000)
         }
 
         // setTimeout(screenshot5, 2000);
+
+        // setTimeout(preview, 2000);
+
 
         // setTimeout(showBar, 1000, true);
 

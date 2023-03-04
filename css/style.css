@@ -17,6 +17,9 @@
 
 :root {
     --board-size: 0.85;
+    --blue: steelblue;
+    --yellow: gold;
+    --red: firebrick;
 }
 
 body {
@@ -46,7 +49,7 @@ body {
 }
 
 h1 {
-    color: steelblue;
+    color: var(--blue);
     text-align: center;
     /* font-size: 27.9vw; */
 
@@ -91,7 +94,7 @@ body:hover {
     /* align-self: start; */
     /* width: calc((var(--board-size) + 3px) / 18); */
     /* margin: auto; */
-    color: steelblue;
+    color: var(--blue);
     font-size: 2em;
     font-weight: bold;
     cursor: pointer;
@@ -117,8 +120,8 @@ body:hover {
 
     width: calc(var(--board-size) / 5.6);
     transform: translateY(5.2vmin);
-    transition: 0.1s ease-in-out;
-    fill: steelblue;
+    transition: 0.2s ease-in-out;
+    fill: var(--blue);
 }
 
 /* svg {
@@ -131,8 +134,8 @@ body:hover {
 /* } */
 
 .on { 
-    fill: gold;
-    /* transition: 0.2s ease-in-out; */
+    fill: var(--yellow);
+    /* transition: 0.15s ease-in-out; */
 }
 
 .display {
@@ -145,8 +148,8 @@ body:hover {
 .board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    border: 10px solid steelblue;
-    background-color: steelblue;
+    border: 10px solid var(--blue);
+    background-color: var(--blue);
     width: calc(var(--board-size) + 3px);
     height: calc(var(--board-size) + 3px);
     border-radius: 7px;
@@ -190,14 +193,19 @@ body:hover {
     }
   
     37% {
-        color: firebrick; 
-        /* color: #e23838; */
+        color: var(--red);
     } 
 
     75% {
         color: white; 
     } 
 }
+
+/* @keyframes incorrect {
+    50% {
+      opacity: 1;
+    }
+} */
 
 
 @keyframes correct {
@@ -206,7 +214,7 @@ body:hover {
     }
   
     37% {
-        color: steelblue; 
+        color: var(--blue); 
     } 
 
     75% {
@@ -215,7 +223,7 @@ body:hover {
 }
 
 .filled {
-    color: steelblue;
+    color: var(--blue);
     transition: color 0.2s ease;
 }
 
@@ -318,7 +326,7 @@ body:hover {
 
 
     .board {
-        border: 15px solid steelblue;
+        border: 15px solid var(--blue);
         /* width: calc(var(--board-size-big) + 4px); */
         /* height: calc(var(--board-size-big) + 4px); */
         width: calc(var(--board-size-big) + 3px);
