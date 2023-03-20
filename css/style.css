@@ -45,7 +45,7 @@ body {
 h1 {
     color: var(--blue);
     text-align: center;
-    font-size: 28vw;
+    font-size: calc(var(--board-size) / 3.09);
     margin-top: -10px;
     margin-bottom: 8px;
 }
@@ -73,7 +73,7 @@ body:hover {
     place-items: center;
     align-content: center;
     color: var(--blue);
-    font-size: 2em;
+    font-size: 8.5vmin;
     font-weight: bold;
     cursor: pointer;
 }
@@ -100,13 +100,12 @@ body:hover {
 
 .display {
     transition: opacity 0.2s ease;
-    opacity: 1;
     visibility: visible;
+    opacity: 1;
 }
 
 .board {
     display: grid;
-    /* position: relative; */
     grid-template-columns: repeat(9, 1fr);
     border: 10px solid var(--blue);
     background-color: var(--blue);
@@ -117,53 +116,13 @@ body:hover {
     margin: auto;
 }
 
-.board:after {
-    content: 'ⓧ';
-
-    display: grid;
-    place-items: start end;
-    position: absolute;
-
-    box-sizing: border-box;
-
-    background-color: rgba(70, 130, 180, 0.2);
-    border-right: 5px solid rgba(70, 130, 180, 0);
-    border-left: 5px solid rgba(70, 130, 180, 0);
-
-    left: 20px;
-    top: 20px;
-    /* width: calc(var(--board-size) + 3px); */
-    /* height: calc(var(--board-size) + 3px); */
-    width: calc(var(--board-size) + 3px - 40px);
-    height: calc(var(--board-size) + 3px - 40px);
-    color: rgba(70, 130, 180, 1);
-    /* font-size: 20vmin; */
-    font-size: 7vmin;
-    font-weight: bold;
-    /* left: -10px; */
-    /* opacity: 0.6; */
-    /* content: ''; */
-    /* background-image: url(../images/sync-alt.svg); */
-    /* background-image: url(../images/rotate-solid.svg); */
-
-    background-image: url(../images/pngwing.svg);
-
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    /* background-size: 80vmin 80vmin; */
-    background-size: 50vmin 50vmin;
-
-
-    display: none;
-}
-
 .cell {
     box-sizing: border-box;
     display: grid;
     justify-content: center;
     align-content: center;
     color: white;
-    font-size: 1.5em;
+    font-size: 6.5vmin;
     background-color: white;
     width: calc(var(--board-size) / 9 - 1px);
     height: calc(var(--board-size) / 9 - 1px);
@@ -249,7 +208,7 @@ body:hover {
     align-self: auto;
     color: white;
     font-size: 0.55em; 
-    margin-top: -1.35em;
+    margin-top: -1.33em;
     transition: opacity 0.5s linear;
 }
 
@@ -260,7 +219,7 @@ body:hover {
     }
 
     .board {
-        margin-top: 0px;
+        margin-top: 0;
     }
 }
 
@@ -271,7 +230,7 @@ body:hover {
     }
 
     h1 {
-        font-size: 133px;
+        font-size: 132px;
     }
 
     .numbers {
@@ -280,7 +239,7 @@ body:hover {
     }
 
     .number {
-        font-size: 2em;
+        font-size: 33px;
     }
 
     .number:after {
@@ -299,30 +258,12 @@ body:hover {
         border: 15px solid var(--blue);
         width: calc(var(--board-size-big) + 3px);
         height: calc(var(--board-size-big) + 3px);
-        gap: 1px 1px;
-    }
-
-    .board:after {
-        /* content: 'A'; */
-        /* display: grid; */
-        /* place-items: center; */
-        position: absolute;
-        /* background-color: #ecf2f7; */
-        /* border: 1px solid #003800; */
-        /* border-radius: 4px; */
-        width: calc(var(--board-size-big) + 3px);
-        height: calc(var(--board-size-big) + 3px);
-        /* color: var(--table-color); */
-        font-size: 10vmin;
-        /* font-weight: bold; */
-        /* left: -1px; */
-        background-size: 50vmin 50vmin;
     }
 
     .cell {
         width: calc(var(--board-size-big) / 9 - 1px);
         height: calc(var(--board-size-big) / 9 - 1px);
-        box-sizing: border-box;
+        font-size: 25px;
     }
 
     #designed {

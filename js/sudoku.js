@@ -1,20 +1,16 @@
 let board = [];
-// let hiddens = [];
 
-let startTime; //
-let times = []; //
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-            .then(reg => {
-                console.log('Service worker registered!', reg);
-            })
-            .catch(err => {
-                console.log('Service worker registration failed: ', err);
-            });
-    });
-}
+// if ('serviceWorker' in navigator) {
+//     window.addEventListener('load', () => {
+//         navigator.serviceWorker.register('service-worker.js')
+//             .then(reg => {
+//                 console.log('Service worker registered!', reg);
+//             })
+//             .catch(err => {
+//                 console.log('Service worker registration failed: ', err);
+//             });
+//     });
+// }
 
 const showBoard = () => document.body.style.opacity = 1;
 
@@ -37,67 +33,6 @@ const setBoardSize = () => {
     document.documentElement.style.setProperty('--board-size', boardSize + 'px');
 }
 
-const saveBoard = () => {
-
-    // if (localStorage.getItem('solved') == null) {
-    //     let solved = solve();
-    //     localStorage.setItem('solved', JSON.stringify(solved));
-    // }
-    if (aiMode()) return;
-    
-    let boardExp = {
-
-        board,
-        // expiry: Date.now() + 604800000; // 1000 * 60 * 60 * 24 * 7
-        expiry: Date.now() + 1000 * 60 * 60 * 24 * 7
-    }
-
-    // localStorage.setItem('board', JSON.stringify(board));
-
-    localStorage.setItem('board', JSON.stringify(boardExp));
-}
-
-const checkStorage = () => {
-
-    if (aiMode()) return;
-
-    // if (localStorage.getItem('board') != null) {
-
-    //     let solved = JSON.parse(localStorage.getItem('solved'));
-
-    //     board = JSON.parse(localStorage.getItem('board'));
-
-    //     saveSolution(solved);
-    // }
-
-    if (localStorage.getItem('board') != null) {
-
-        let boardStr = JSON.parse(localStorage.getItem('board'));
-
-        if (Date.now() > boardStr.expiry) return;
-        
-        // if (Date.now() > boardStr.expiry) {
-        //     clearStorage();
-        //     return;
-        // }
-
-        board = boardStr.board;
-
-        // let solved = solve();
-
-        // saveSolution();
-    }
-}
-
-const cellCoords = (touchedCell) => {
-
-    let cells = document.querySelectorAll('.cell');
-
-    for (let [i, cell] of cells.entries()) {
-        if (cell == touchedCell) return [Math.trunc(i / 9), i % 9];
-    }
-}
-
 const shuffle = (array) => {
 
     for (let i = array.length - 1; i > 0; i--) {
@@ -114,17 +49,17 @@ const permuteArrays = (arrays) => {
 
     if (arrays.length == 0) return [[]];
   
-      let result = [];
+    let result = [];
 
-      arrays[0].forEach(el =>  {
+    arrays[0].forEach(el =>  {
 
         let rest = permuteArrays(arrays.slice(1));
 
         rest.forEach(permutation => result.push([...new Set([el].concat(permutation))]));
-      });
+    });
 
-      return result.sort((a, b) => a - b);
-  }
+    return result.sort((a, b) => a - b);
+}
 
 const validDigit = (board, row, col, val) => {
 
@@ -162,7 +97,7 @@ const checkRows = (board, {hint = false} = {}, hiddens = []) => {
 
             if (r != undefined) {
                 if (!hint) return [r, c, val, 'row'];
-                hiddens.push([r, c, val, 'row'])
+                hiddens.push([r, c, val, 'row']);
             }
         }
     }
@@ -188,7 +123,7 @@ const checkCols = (board, {hint = false} = {}, hiddens = []) => {
 
             if (r != undefined) {
                 if (!hint) return [r, c, val, 'col'];
-                hiddens.push([r, c, val, 'col'])
+                hiddens.push([r, c, val, 'col']);
             }
         }
     }
@@ -219,7 +154,7 @@ const checkBoxes = (board, {hint = false} = {}, hiddens = []) => {
 
             if (r != undefined) {
                 if (!hint) return [r, c, val, 'box'];
-                hiddens.push([r, c, val, 'box'])
+                hiddens.push([r, c, val, 'box']);
             }
         }
     }
@@ -254,49 +189,123 @@ const solved = (board) => {
     return true;
 }
 
-// const solve = () => {
+const rowClues = (row, col, val) => {
 
-//     let tempBoard = board.map(arr => arr.slice());
+    let clues = [];
 
-//     do {
-
-//         let [row, col, val, _] = findDigit(tempBoard);
-
-//         if (row == null) return false;
-
-//         tempBoard[row][col] = val;
-
-//     } while(!solved(tempBoard));
-
-//     return tempBoard;
-// }
-
-const getData = () => {
-
-    let abc ='abcdefghijklmnopqrstuvwxyz';
-    let n = Math.trunc(Math.random() * sudokus.length);
-    let sudoku = sudokus[n];
-    // let sudoku = sudokus[1525];
-    board = [[],[],[],[],[],[],[],[],[]];
-
-    for (let i = 0; i < abc.length; i++) {
-        
-        let zeroes = '0'.repeat(i + 1); 
-        let regex = new RegExp(abc[i], 'g');
-
-        sudoku = sudoku.replace(regex, zeroes);   
-    }
- 
     for (let i = 0; i < 9; i++) {
+
+        if (board[row][i] != 0) continue;
+
+        let boxRow = Math.trunc(row / 3) * 3;
+        let boxCol = Math.trunc(i / 3) * 3;
+        let squareClues = [];
+
         for (let j = 0; j < 9; j++) {
-            board[i][j] = Number(sudoku[i * 9 + j]);
+
+            let currentRow = boxRow + Math.trunc(j / 3);
+            let currentCol = boxCol + j % 3;
+
+            if (board[currentRow][currentCol] == val) squareClues.push(currentRow * 9 + currentCol);
+            if (board[j][i] == val) squareClues.push(j * 9 + i);
         }
+
+        if (squareClues.length != 0) clues.push(squareClues);
     }
+
+    return clues;
+}
+
+const colClues = (row, col, val) => {
+
+    let clues = [];
+
+    for (let i = 0; i < 9; i++) {
+
+        if (board[i][col] != 0) continue;
+
+        let boxRow = Math.trunc(i / 3) * 3;
+        let boxCol = Math.trunc(col / 3) * 3;
+        let squareClues = [];
+
+        for (let j = 0; j < 9; j++) {
+
+            let currentRow = boxRow + Math.trunc(j / 3);
+            let currentCol = boxCol + j % 3;
+
+            if (board[currentRow][currentCol] == val) squareClues.push(currentRow * 9 + currentCol);
+            if (board[i][j] == val) squareClues.push(i * 9 + j);
+        }
+
+        if (squareClues.length != 0) clues.push(squareClues);
+    }
+
+    return clues;
+}
+
+const boxClues = (row, col, val) => {
+
+    let clues = [];
+    let boxRow = Math.trunc(row / 3) * 3;
+    let boxCol = Math.trunc(col / 3) * 3;
+
+    for (let i = 0; i < 9; i++) {
+
+        let squareClues = [];
+        let currentRow = boxRow + Math.trunc(i / 3);
+        let currentCol = boxCol + i % 3;
+
+        if (board[currentRow][currentCol] != 0) continue;
+
+        for (let j = 0; j < 9; j++) {
+            if (board[currentRow][j] == val) squareClues.push(currentRow * 9 + j);
+            if (board[j][currentCol] == val) squareClues.push(j * 9 + currentCol);
+        }
+
+        if (squareClues.length != 0) clues.push(squareClues);
+    }
+
+    return clues;
+}
+
+const hint = () => {
+
+    let hiddens = [];
+
+    checkBoxes(board, {hint: true}, hiddens);
+    checkRows(board, {hint: true}, hiddens);
+    checkCols(board, {hint: true}, hiddens);
+
+    hiddens.forEach(hidden => {
+
+        let [row, col, val, type] = hidden;
+        let clues;
+
+        switch(type) {
+
+            case 'row':
+                clues = rowClues(row, col, val);
+                break;
+            case 'col':
+                clues = colClues(row, col, val);
+                break;
+            case 'box':
+                clues = boxClues(row, col, val);
+                break;
+        }
+
+        clues = minArray(permuteArrays(clues));
+        
+        hidden.push(clues);
+    });
+
+    let hidden = hiddens.reduce((prev, next) => prev[4].length > next[4].length ? next : prev);
+
+    return hidden;
 }
 
 const saveSolution = () => {
 
-    // let tempBoard = solve();
     let cells = document.querySelectorAll('.cell');
     let tempBoard = board.map(arr => arr.slice());
 
@@ -319,11 +328,11 @@ const saveSolution = () => {
 
 const fillBoard = () => {
 
-    let flatBoard = board.flat();
+    let board1D = board.flat();
 
     document.querySelectorAll('.cell').forEach(cell => {
 
-        let val = flatBoard.shift();
+        let val = board1D.shift();
 
         if (val) {
             cell.firstChild.innerText = val;
@@ -332,56 +341,6 @@ const fillBoard = () => {
             cell.firstChild.innerText = '';
         }
     });
-}
-
-const selectCell = (e) => {
-
-    if (solved(board)) return;
-
-    let cell = e.currentTarget;
-    let cells = document.querySelectorAll('.cell');
-    let numbers = document.querySelector('.numbers');
-
-    clearHint();
-
-    // let [row, col] = cellCoords(cell);
-
-    // let val = Number(cell.dataset.val);
-
-    // console.log(row, col, val);
-
-    if (cell.classList.contains('filled')) { 
-
-        cells.forEach(cell => cell.classList.remove('select'));
-
-        // for (let cell of cells) {
-        //     cell.classList.remove('select');
-        // }
-
-        numbers.classList.remove('display');
-
-        return;
-    }
-
-    if (cell.classList.contains('select')) {
-
-        cell.classList.remove('select');
-        numbers.classList.remove('display');
-
-        return;
-    } 
-
-    cells.forEach(cell => cell.classList.remove('select'));
-
-    // for (let cell of cells) {
-    //     cell.classList.remove('select');
-    // }
-
-    cell.classList.add('select');
-
-    numbers.classList.remove('display');
-
-    setTimeout(() => numbers.classList.add('display'), 0);
 }
 
 const clearHint = () => {
@@ -395,7 +354,6 @@ const clearHint = () => {
         let hint = document.querySelector('.hint');
 
         hint.style.transition = '0.1s ease-in-out';
-        
         hint.classList.remove('on');
 
         hint.addEventListener('transitionend', (e) => {
@@ -405,7 +363,6 @@ const clearHint = () => {
             hint.style.transition = '';
        
         }, {once: true}); 
-    
     }
 
     for (let cell of cells) {
@@ -416,20 +373,20 @@ const clearHint = () => {
         }
 
         cell.style.transition = '';
-
         cell.classList.remove('gray', 'bold', 'incorrect','correct', 'pop');
     }
 }
 
 const showHint = (e) => {
 
-    if (solved(board)) return;
+    let hintEl = document.querySelector('.hint');
 
-    if (document.querySelector('.hint').classList.contains('on') && !aiMode()) return;
+    if (solved(board)) return;
+    if (hintEl.classList.contains('on') && !aiMode()) return;
     
     clearHint();
 
-    if (!aiMode()) document.querySelector('.hint').classList.add('on');
+    if (!aiMode()) hintEl.classList.add('on');
 
     let cells = document.querySelectorAll('.cell');
     let [row, col, val, type, clues] = hint();
@@ -547,12 +504,9 @@ const showHint = (e) => {
 
     cell.firstChild.innerText = val;
 
-    // let repeats = aiMode() ? 4.37 : 5;
     let repeats = aiMode() ? 4.37 : 4.5;
-    // repeats = 3;
 
     cell.style.animation = `correct 0.75s ${repeats} ease forwards`;
-    // cell.style.transition = `all 1s linear`;
     cell.style.animationDelay = `${delay}s`;
     cell.classList.add('correct');
             
@@ -565,7 +519,7 @@ const showHint = (e) => {
         cell.style.animation = '';
         cell.style.animationDuration = '';
 
-        if (!aiMode()) document.querySelector('.hint').classList.remove('on');        
+        if (!aiMode()) hintEl.classList.remove('on');        
 
         document.querySelectorAll('.gray, .bold').forEach(cell => {
             cell.style.transition = `background-color 0.2s ease-in-out, font-weight 0.2s ease-in-out`;
@@ -581,121 +535,46 @@ const showHint = (e) => {
     }, {once: true});
 }
 
-const rowClues = (row, col, val) => {
+const cellCoords = (touchedCell) => {
 
-    let clues = [];
+    let cells = document.querySelectorAll('.cell');
 
-    for (let i = 0; i < 9; i++) {
-
-        if (board[row][i] != 0) continue;
-
-        let boxRow = Math.trunc(row / 3) * 3;
-        let boxCol = Math.trunc(i / 3) * 3;
-        let squareClues = [];
-
-        for (let j = 0; j < 9; j++) {
-
-            let currentRow = boxRow + Math.trunc(j / 3);
-            let currentCol = boxCol + j % 3;
-
-            if (board[currentRow][currentCol] == val) squareClues.push(currentRow * 9 + currentCol);
-            if (board[j][i] == val) squareClues.push(j * 9 + i);
-        }
-
-        if (squareClues.length != 0) clues.push(squareClues);
+    for (let [i, cell] of cells.entries()) {
+        if (cell == touchedCell) return [Math.trunc(i / 9), i % 9];
     }
-
-    return clues;
 }
 
-const colClues = (row, col, val) => {
+const selectCell = (e) => {
 
-    let clues = [];
+    if (solved(board)) return;
 
-    for (let i = 0; i < 9; i++) {
+    let cell = e.currentTarget;
+    let cells = document.querySelectorAll('.cell');
+    let numbers = document.querySelector('.numbers');
 
-        if (board[i][col] != 0) continue;
+    clearHint();
 
-        let boxRow = Math.trunc(i / 3) * 3;
-        let boxCol = Math.trunc(col / 3) * 3;
-        let squareClues = [];
+    if (cell.classList.contains('filled')) { 
 
-        for (let j = 0; j < 9; j++) {
+        cells.forEach(cell => cell.classList.remove('select'));
 
-            let currentRow = boxRow + Math.trunc(j / 3);
-            let currentCol = boxCol + j % 3;
+        numbers.classList.remove('display');
 
-            if (board[currentRow][currentCol] == val) squareClues.push(currentRow * 9 + currentCol);
-            if (board[i][j] == val) squareClues.push(i * 9 + j);
-        }
-
-        if (squareClues.length != 0) clues.push(squareClues);
+        return;
     }
 
-    return clues;
-}
+    if (cell.classList.contains('select')) {
 
-const boxClues = (row, col, val) => {
+        cell.classList.remove('select');
+        numbers.classList.remove('display');
 
-    let clues = [];
-    let boxRow = Math.trunc(row / 3) * 3;
-    let boxCol = Math.trunc(col / 3) * 3;
+        return;
+    } 
 
-    for (let i = 0; i < 9; i++) {
-
-        let squareClues = [];
-        let currentRow = boxRow + Math.trunc(i / 3);
-        let currentCol = boxCol + i % 3;
-
-        if (board[currentRow][currentCol] != 0) continue;
-
-        for (let j = 0; j < 9; j++) {
-            if (board[currentRow][j] == val) squareClues.push(currentRow * 9 + j);
-            if (board[j][currentCol] == val) squareClues.push(j * 9 + currentCol);
-        }
-
-        if (squareClues.length != 0) clues.push(squareClues);
-    }
-
-    return clues;
-}
-
-const hint = () => {
-
-    let hiddens = [];
-
-    checkBoxes(board, {hint: true}, hiddens);
-    checkRows(board, {hint: true}, hiddens);
-    checkCols(board, {hint: true}, hiddens);
-
-    hiddens.forEach(hidden => {
-
-        let [row, col, val, type] = hidden;
-
-        let clues;
-
-        switch(type) {
-
-            case 'row':
-                clues = rowClues(row, col, val);
-                break;
-            case 'col':
-                clues = colClues(row, col, val);
-                break;
-            case 'box':
-                clues = boxClues(row, col, val);
-                break;
-        }
-
-        clues = minArray(permuteArrays(clues));
-
-        hidden.push(clues);
-
-    });
-
-    let hidden = hiddens.reduce((prev, next) => prev[4].length > next[4].length ? next : prev);
-
-    return hidden;
+    cells.forEach(cell => cell.classList.remove('select'));
+    cell.classList.add('select');
+    numbers.classList.remove('display');
+    setTimeout(() => numbers.classList.add('display'), 0);
 }
 
 const selectDigit = (e) => {
@@ -716,9 +595,11 @@ const selectDigit = (e) => {
             cell.firstChild.innerText = digit;
 
             if (cell.dataset.val == digit) {
+
                 cell.classList.add('filled');
                 board[row][col] = digit;
                 saveBoard();
+
             } else {
                 
                 cell.classList.add('incorrect');
@@ -746,60 +627,90 @@ const selectDigit = (e) => {
     }
 }
 
+const getData = () => {
+
+    let abc ='abcdefghijklmnopqrstuvwxyz';
+    let n = Math.trunc(Math.random() * sudokus.length);
+    let sudoku = sudokus[n];
+
+    board = [[],[],[],[],[],[],[],[],[]];
+
+    console.log(n); //
+
+    for (let i = 0; i < abc.length; i++) {
+        
+        let zeroes = '0'.repeat(i + 1); 
+        let regex = new RegExp(abc[i], 'g');
+
+        sudoku = sudoku.replace(regex, zeroes);   
+    }
+ 
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            board[i][j] = Number(sudoku[i * 9 + j]);
+        }
+    }
+}
+
+const saveBoard = () => {
+
+    if (aiMode()) return;
+    
+    let boardExp = {
+
+        board,
+        // expiry: Date.now() + 604800000; // 1000 * 60 * 60 * 24 * 7
+        expiry: Date.now() + 1000 * 60 * 60
+    }
+
+    localStorage.setItem('board', JSON.stringify(boardExp));
+}
+
+const checkStorage = () => {
+
+    if (aiMode()) return;
+
+    if (localStorage.getItem('board') != null) {
+
+        let boardStr = JSON.parse(localStorage.getItem('board'));
+
+        if (Date.now() > boardStr.expiry) return;
+
+        board = boardStr.board;
+    }
+}
+
 const reset = () => {
 
     let boardEl = document.querySelector('.board');
 
     clearHint();
-    // if (!aiMode()) clearStorage();
     boardEl.removeEventListener('touchstart', reset);
     boardEl.removeEventListener('mousedown', reset);
     boardEl.style.cursor = 'default';
 
     document.querySelectorAll('.cell').forEach(cell => {
         cell.classList.remove('filled');
-        // cell.firstChild.classList.remove('pop');
         cell.style.cursor = 'default'
     });
 
     setTimeout(() => {
 
-        // initBoard();    
         getData();
         saveSolution(); 
         fillBoard();
 
-        startTime = Date.now(); //
-
-        // if (aiMode()) {
-        //     // disableTouch();
-        //     setTimeout(showHint, 500)
-        // } else {
-        //     saveBoard();
-        //     // enableTouch();
-        // }   
-
-        aiMode() ? setTimeout(showHint, 500) :  saveBoard();
+        aiMode() ? setTimeout(showHint, 500) : saveBoard();
 
     }, 50);    
 }
 
 const firework = () => {
 
-    times.push(Number(((Date.now() - startTime) / 1000 / 60).toFixed(1))); //
-    console.log(times); //
-    console.log(times.reduce((a, b) => a + b, 0) / times.length); //
-
     let n = 0;
     let cells = document.querySelectorAll('.cell');
 
     cells.forEach(cell => cell.removeAttribute('style'));
-
-    // for (let cell of cells) {
-    //     cell.removeAttribute('style');
-    // }
-
-    // disableTouch();
 
     let order = Array.from({length: 81}, (_, i) => i);
     order = shuffle(order);
@@ -812,11 +723,10 @@ const firework = () => {
             
             document.querySelector('.board').addEventListener('touchstart', reset);
             document.querySelector('.board').addEventListener('mousedown',  reset);
-
             document.querySelector('.board').style.cursor = 'pointer';
             cells.forEach(cell => cell.style.cursor = 'pointer');
 
-            if (aiMode()) setTimeout(reset, 1000); //
+            // if (aiMode()) setTimeout(reset, 1000); //
 
         } else {
 
@@ -836,7 +746,7 @@ const firework = () => {
     let interval = setInterval(pop, 100);
 }
 
-const enableDigits = () => {
+const enableNumPad = () => {
 
     if (aiMode()) return;
 
@@ -853,31 +763,28 @@ const enableDigits = () => {
 
 const enableHints = () => {
 
-    if (aiMode()) return;
-
     let hint = document.querySelector('.hint');
 
+    if (aiMode()) {
+        hint.classList.add('on');
+        return;
+    }
+
     if (touchScreen()){
-
         hint.addEventListener("touchstart", () => {
-
             document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('select'));
-    
             setTimeout(() => showHint(), 0);
         });
-
     } else {
-
         hint.addEventListener("mousedown", () => {
-
             document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('select'));
-    
             setTimeout(() => showHint(), 0);
         });
 
         hint.style.cursor = 'pointer';
     }
-
+        
+    hint.classList.add('on');
     setTimeout(() => hint.classList.remove('on'), 1000);
 }
 
@@ -903,9 +810,11 @@ const enableKeys = () => document.addEventListener('keydown', e => {
     let event = new Event('mousedown');
     let numbers = document.querySelectorAll('.number');
     let boardEl = document.querySelector('.board');
-    let codes = ['Escape', 'Space', 'Enter'];
+    let keys = ['Escape', 'Space', 'Enter'];
 
-    if (codes.includes(e.code) && solved(board)) boardEl.dispatchEvent(event);
+    reset(); //
+
+    if (keys.includes(e.code) && solved(board)) boardEl.dispatchEvent(event);
     if (!document.querySelector('.numbers').classList.contains('display')) return;
     if (!digits.includes(Number(e.key))) return;
 
@@ -935,31 +844,20 @@ const init = () => {
 
     disableTapZoom();
     setBoardSize();
-    // initBoard();
+
     getData();
-
-    // if (!aiMode()) checkStorage();
-
     checkStorage();
-
     saveSolution(); 
-    
     saveBoard();
-
     fillBoard();
     showBoard();
-    enableKeys();
 
+    enableKeys();
     enableTouch();
-    enableDigits();
+    enableNumPad();
     enableHints();
 
-    // if (aiMode()) setTimeout(showHint, 2000);
-
-    if (aiMode()) {
-        setTimeout(showHint, 2000);
-        startTime = Date.now(); //
-    }
+    if (aiMode()) setTimeout(showHint, 1500);
 
     // setTimeout(screenshot5, 2000);
 
