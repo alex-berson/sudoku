@@ -1,16 +1,16 @@
 let board = [];
 
-// if ('serviceWorker' in navigator) {
-//     window.addEventListener('load', () => {
-//         navigator.serviceWorker.register('service-worker.js')
-//             .then(reg => {
-//                 console.log('Service worker registered!', reg);
-//             })
-//             .catch(err => {
-//                 console.log('Service worker registration failed: ', err);
-//             });
-//     });
-// }
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+            .then(reg => {
+                console.log('Service worker registered!', reg);
+            })
+            .catch(err => {
+                console.log('Service worker registration failed: ', err);
+            });
+    });
+}
 
 const showBoard = () => document.body.style.opacity = 1;
 
@@ -79,7 +79,7 @@ const validDigit = (board, row, col, val) => {
     return true;
 }
 
-const checkRows = (board, {hint = false} = {}, hiddens = []) => {
+const checkRows = (board, hiddens = [], {hint = false} = {}) => {
 
     for (let row = 0; row < 9; row++) {
         outer: for (let val = 1; val <= 9; val++) {
@@ -105,7 +105,7 @@ const checkRows = (board, {hint = false} = {}, hiddens = []) => {
     return [null, null, null, null];
 }
 
-const checkCols = (board, {hint = false} = {}, hiddens = []) => {
+const checkCols = (board, hiddens = [], {hint = false} = {}) => {
 
     for (let col = 0; col < 9; col++) {
         outer: for (let val = 1; val <= 9; val++) {
@@ -131,7 +131,7 @@ const checkCols = (board, {hint = false} = {}, hiddens = []) => {
     return [null, null, null, null];
 }
 
-const checkBoxes = (board, {hint = false} = {}, hiddens = []) => {
+const checkBoxes = (board, hiddens = [], {hint = false} = {}) => {
 
     for (let box = 0; box < 9; box++) {
         outer: for (let val = 1; val <= 9; val++) {
@@ -272,9 +272,9 @@ const hint = () => {
 
     let hiddens = [];
 
-    checkBoxes(board, {hint: true}, hiddens);
-    checkRows(board, {hint: true}, hiddens);
-    checkCols(board, {hint: true}, hiddens);
+    checkBoxes(board, hiddens, {hint: true});
+    checkRows(board, hiddens, {hint: true});
+    checkCols(board, hiddens, {hint: true});
 
     hiddens.forEach(hidden => {
 
@@ -635,8 +635,6 @@ const getData = () => {
 
     board = [[],[],[],[],[],[],[],[],[]];
 
-    console.log(n); //
-
     for (let i = 0; i < abc.length; i++) {
         
         let zeroes = '0'.repeat(i + 1); 
@@ -659,8 +657,7 @@ const saveBoard = () => {
     let boardExp = {
 
         board,
-        // expiry: Date.now() + 604800000; // 1000 * 60 * 60 * 24 * 7
-        expiry: Date.now() + 1000 * 60 * 60
+        expiry: Date.now() + 1000 * 60 * 60 * 24 * 7
     }
 
     localStorage.setItem('board', JSON.stringify(boardExp));
@@ -700,7 +697,12 @@ const reset = () => {
         saveSolution(); 
         fillBoard();
 
-        aiMode() ? setTimeout(showHint, 500) : saveBoard();
+        if (aiMode()) {
+            document.querySelector('.hint').classList.add('on');
+            setTimeout(showHint, 500);
+        } else {
+            saveBoard();
+        }
 
     }, 50);    
 }
@@ -709,6 +711,8 @@ const firework = () => {
 
     let n = 0;
     let cells = document.querySelectorAll('.cell');
+
+    if (aiMode()) document.querySelector('.hint').classList.remove('on');
 
     cells.forEach(cell => cell.removeAttribute('style'));
 
@@ -725,8 +729,6 @@ const firework = () => {
             document.querySelector('.board').addEventListener('mousedown',  reset);
             document.querySelector('.board').style.cursor = 'pointer';
             cells.forEach(cell => cell.style.cursor = 'pointer');
-
-            // if (aiMode()) setTimeout(reset, 1000); //
 
         } else {
 
@@ -812,8 +814,6 @@ const enableKeys = () => document.addEventListener('keydown', e => {
     let boardEl = document.querySelector('.board');
     let keys = ['Escape', 'Space', 'Enter'];
 
-    reset(); //
-
     if (keys.includes(e.code) && solved(board)) boardEl.dispatchEvent(event);
     if (!document.querySelector('.numbers').classList.contains('display')) return;
     if (!digits.includes(Number(e.key))) return;
@@ -836,8 +836,6 @@ const aiMode = () => {
     let mode = urlParams.get('mode');
     
     return mode == 'ai';
-
-    // return true; //
 }
 
 const init = () => {
@@ -858,10 +856,6 @@ const init = () => {
     enableHints();
 
     if (aiMode()) setTimeout(showHint, 1500);
-
-    // setTimeout(screenshot5, 2000);
-
-    // setTimeout(preview, 2000);
 }
 
 window.onload = () => document.fonts.ready.then(init());

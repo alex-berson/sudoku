@@ -23,6 +23,10 @@ body {
     opacity: 0;
 }
 
+body:hover {
+    cursor: default;
+}
+
 #outer {
     display: table;
     position: absolute;
@@ -48,10 +52,6 @@ h1 {
     font-size: calc(var(--board-size) / 3.09);
     margin-top: -10px;
     margin-bottom: 8px;
-}
-
-body:hover {
-    cursor: default;
 } 
 
 .numbers {
@@ -209,7 +209,6 @@ body:hover {
     color: white;
     font-size: 0.55em; 
     margin-top: -1.33em;
-    transition: opacity 0.5s linear;
 }
 
 @media (orientation: landscape) and (max-height: 460px) {
@@ -220,6 +219,13 @@ body:hover {
 
     .board {
         margin-top: 0;
+    }
+}
+
+@media (max-width: 320px), (max-height: 320px) {
+
+    h1 {
+        margin-top: -20px; 
     }
 }
 

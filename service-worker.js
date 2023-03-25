@@ -3,6 +3,7 @@ const files = [
   'https://alex-berson.github.io/sudoku/',
   'index.html',
   'css/style.css',
+  'js/data.js',
   'js/sudoku.js',
   'fonts/roboto-regular-webfont.woff',
   'fonts/roboto-bold-webfont.woff'
