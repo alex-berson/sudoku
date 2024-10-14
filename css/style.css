@@ -1,17 +1,18 @@
 @font-face {
     font-family: 'Roboto';
-    src: url(../fonts/roboto-regular-webfont.woff);
+    src: url(../fonts/roboto-regular.woff);
 }
 
 @font-face {
     font-family: 'Roboto';
-    src: url(../fonts/roboto-bold-webfont.woff);
+    src: url(../fonts/roboto-bold.woff);
     font-weight: bold;
 }
 
 :root {
-    --board-size: 0.85;
-    --blue: steelblue;
+    --board-size: 85vmin;
+    --primary-color: steelblue;
+    --select-color: #ecf2f7;
     --yellow: gold;
     --red: firebrick;
 }
@@ -19,12 +20,10 @@
 body {
     font-family: 'Roboto', sans-serif;
     transition: opacity 2s ease;
+    background-color: white;
+    overflow: hidden;
     margin: 0;
     opacity: 0;
-}
-
-body:hover {
-    cursor: default;
 }
 
 #outer {
@@ -35,26 +34,26 @@ body:hover {
     top: 0;
     left: 0;
 }
-  
+
 #middle {
     display: table-cell;
     vertical-align: middle;
 }
-  
+
 #inner {
     margin-left: auto;
     margin-right: auto;
 }
 
 h1 {
-    color: var(--blue);
+    color: var(--primary-color);
     text-align: center;
     font-size: calc(var(--board-size) / 3.09);
     margin-top: -10px;
     margin-bottom: 8px;
 } 
 
-.numbers {
+.numpad {
     display: flex;
     width: calc(var(--board-size) + 3px);
     height: calc(var(--board-size) / 9);
@@ -65,20 +64,17 @@ h1 {
     visibility: hidden;
 }
 
-.number {
+.digit {
     display: grid;
     position: relative; 
-    grid-column: 1;
-    grid-row: 1;
     place-items: center;
-    align-content: center;
-    color: var(--blue);
+    cursor: pointer;
+    color: var(--primary-color);
     font-size: 8.5vmin;
     font-weight: bold;
-    cursor: pointer;
 }
 
-.number:after {
+.digit::after {
     content: '';
     position: absolute;
     left: calc(var(--board-size) / -38);
@@ -87,15 +83,20 @@ h1 {
     bottom: -5px;
 }
 
-.hint {
+.bulb {
     width: calc(var(--board-size) / 5.6);
+    fill: var(--primary-color);
     transform: translateY(5.2vmin);
-    transition: 0.2s ease-in-out;
-    fill: var(--blue);
+    transition: fill 0.1s ease-in-out;
 }
 
 .on { 
+    cursor: default !important;
     fill: var(--yellow);
+}
+
+.socket {
+    fill: var(--primary-color);
 }
 
 .display {
@@ -107,8 +108,8 @@ h1 {
 .board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    border: 10px solid var(--blue);
-    background-color: var(--blue);
+    border: 10px solid var(--primary-color);
+    background-color: var(--primary-color);
     width: calc(var(--board-size) + 3px);
     height: calc(var(--board-size) + 3px);
     border-radius: 7px;
@@ -117,10 +118,9 @@ h1 {
 }
 
 .cell {
-    box-sizing: border-box;
     display: grid;
-    justify-content: center;
-    align-content: center;
+    place-items: center;
+    box-sizing: border-box;
     color: white;
     font-size: 6.5vmin;
     background-color: white;
@@ -141,29 +141,64 @@ h1 {
 }
 
 .filled {
-    color: var(--blue);
+    cursor: default !important;
+    color: var(--primary-color);
     transition: color 0.2s ease;
 }
 
-.select, .gray {
-    background-color: #ecf2f7;
+.selected, .shade {
+    background-color: var(--select-color);
+}
+
+.shade {
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
 }
 
 .bold {
     font-weight: bold;
+    transition-property: font-weight;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
 }
 
-.digit {
+.number {
     line-height: 90%;
 }
 
+.visible {
+    opacity: 1;
+}
+
+.clear {
+    transition: background-color 0.2s ease-in-out, font-weight 0.2s ease-in-out !important;
+}
+
+.enabled {
+    cursor: pointer;
+}
+
+.enabled .cell {
+    cursor: pointer !important;
+}
+
+#designed {
+    text-align: center;
+    align-self: auto;
+    color: white;
+    font-size: 9px; 
+    margin-top: -12px;
+}
+
 @keyframes correct {
+
     0% {
         color: white; 
     }
   
     37% {
-        color: var(--blue); 
+        color: var(--primary-color); 
     } 
 
     75% {
@@ -172,6 +207,7 @@ h1 {
 }
 
 @keyframes incorrect {
+
     0% {
         color: white; 
     }
@@ -186,12 +222,13 @@ h1 {
 }
 
 @keyframes pop {
+
     0% {
-      transform: scale(1); 
+        transform: scale(1); 
     }
   
     50% {
-      transform: scale(1.5); 
+        transform: scale(1.5); 
     } 
 
     100% {
@@ -199,16 +236,75 @@ h1 {
     } 
 }
 
+.correct {
+    animation: correct 0.75s 4.5 ease forwards;
+}
+
+.incorrect {
+    animation: incorrect 0.75s 3 ease forwards;
+}
+
 .pop {
     animation: pop 0.3s ease forwards;
 }
 
-#designed {
-    text-align: center;
-    align-self: auto;
-    color: white;
-    font-size: 0.55em; 
-    margin-top: -1.33em;
+@media (prefers-color-scheme: dark) {
+
+    :root {
+        --primary-color: white;
+        --select-color: rgb(70, 70, 70);
+    }
+    
+    body {
+        background-color: black;
+    }
+
+    .cell {
+        background-color: black;
+        color: black;
+    }
+
+    .selected, .shade {
+        background-color: var(--select-color);
+    }
+
+    .filled {
+        color: var(--primary-color);
+    }
+
+    #designed {
+        color: black;
+    }
+
+    @keyframes correct {
+
+        0% {
+            color: black; 
+        }
+      
+        37% {
+            color: var(--primary-color); 
+        } 
+    
+        75% {
+            color: black; 
+        } 
+    }
+
+    @keyframes incorrect {
+
+        0% {
+            color: black; 
+        }
+      
+        37% {
+            color: var(--red); 
+        } 
+    
+        75% {
+            color: black; 
+        } 
+    }
 }
 
 @media (orientation: landscape) and (max-height: 460px) {
@@ -239,29 +335,29 @@ h1 {
         font-size: 132px;
     }
 
-    .numbers {
+    .numpad {
         width: calc(var(--board-size-big) + 3px);
         height: calc(var(--board-size-big) / 9);
     }
 
-    .number {
+    .digit {
         font-size: 33px;
     }
 
-    .number:after {
+    .digit::after {
         top: -5px;
         bottom: -5px;
         left: -13px;
         right: -13px;
     }
 
-    .hint {
+    .bulb {
         width: calc(var(--board-size-big) / 5.4);
         transform: translateY(25px);
     }
 
     .board {
-        border: 15px solid var(--blue);
+        border: 15px solid var(--primary-color);
         width: calc(var(--board-size-big) + 3px);
         height: calc(var(--board-size-big) + 3px);
     }
@@ -273,7 +369,16 @@ h1 {
     }
 
     #designed {
-        font-size: 0.8em; 
-        margin-top: -1.3em;
+        font-size: 12.8px; 
+        margin-top: -17px;
     }
+}
+
+.noselect {
+    -webkit-tap-highlight-color: transparent;
+          -webkit-touch-callout: none;
+            -webkit-user-select: none; 
+               -moz-user-select: none; 
+                -ms-user-select: none; 
+                    user-select: none; 
 }

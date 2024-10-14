@@ -2,7 +2,4 @@ js/generator.js
 js/validator.mjs
 js/simplifier.mjs
 js/compressor.mjs
-js/sudokus123.mjs
-js/sudokus3.mjs
-js/data123.js
 js/preview.js

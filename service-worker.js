@@ -1,12 +1,12 @@
-const cacheName = 'cache-v1';
+const cacheName = 'cache-v2';
 const files = [
-  'https://alex-berson.github.io/sudoku/',
+  '/',
   'index.html',
   'css/style.css',
   'js/data.js',
   'js/sudoku.js',
-  'fonts/roboto-regular-webfont.woff',
-  'fonts/roboto-bold-webfont.woff'
+  'fonts/roboto-regular.woff',
+  'fonts/roboto-bold.woff'
 ];
 
 self.addEventListener('install', event => {

@@ -8,7 +8,7 @@ You can also [watch an AI solving Sudoku](https://alex-berson.github.io/sudoku/i
 
 ## Description
 
-**Sudoku** (/soo·’dow·koo, -’dok-, suh-/; Japanese: 数独 «single digit») is a logic-based, combinatorial number-placement puzzle. In classic Sudoku, the objective is to fill a 9×9 grid with digits so that each column, each row, and each of the nine 3×3 subgrids that compose the grid (also called «boxes», «blocks», or «regions») contain all of the digits from 1 to 9.
+**Sudoku** (/soo·’dow·koo, -’dok-, suh-/; Japanese: 数独 lit. "single digit") is a logic-based, combinatorial number-placement puzzle. In classic Sudoku, the objective is to fill a 9×9 grid with digits so that each column, each row, and each of the nine 3×3 subgrids that compose the grid (also called "boxes", "blocks", or "regions") contain all of the digits from 1 to 9.
 
 ## Screenshot
 
@@ -18,5 +18,5 @@ You can also [watch an AI solving Sudoku](https://alex-berson.github.io/sudoku/i
 
 ## License
 
-Copyright &copy; 2023 Alexander Berson. This project is licensed under the [MIT license](LICENSE.txt "MIT License").
+Copyright &copy; 2023-2024 Alexander Berson. This project is licensed under the [MIT license](LICENSE.txt "MIT License").
 
